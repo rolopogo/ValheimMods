@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BepInEx;
+using ExploreAsOne.Utilities;
+using ExploreTogether.Patches;
+using HarmonyLib;
+using UnityEngine;
+using WeylandMod.Utilities;
+
+namespace ExploreTogether
+{
+    //[BepInProcess("valheim.exe")]
+    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.0.0.0")]
+    public class Plugin : BaseUnityPlugin
+    {
+        public static bool busy { get; private set; }
+
+        public static Plugin Instance { get; private set; }
+        public static BepInEx.Logging.ManualLogSource logger => Instance.Logger;
+        public static BepInEx.Configuration.ConfigFile config => Instance.Config;
+
+        void Awake()
+        {
+            Instance = this;
+            Settings.Init();
+            Harmony.CreateAndPatchAll(typeof(Minimap_Patch), "com.rolopogo.plugins.exploretogether");
+            Harmony.CreateAndPatchAll(typeof(Player_Patch), "com.rolopogo.plugins.exploretogether");
+            Harmony.CreateAndPatchAll(typeof(Chat_Patch), "com.rolopogo.plugins.exploretogether");
+            Harmony.CreateAndPatchAll(typeof(ZNet_Patch), "com.rolopogo.plugins.exploretogether");
+        }
+
+        public static void ShareMap()
+        {
+            var m_explored = Minimap.instance.GetPrivateField<bool[]>("m_explored");
+            var compressed = MapCompression.Compress(m_explored);
+            Plugin.logger.LogDebug($"{m_explored.Length}=>{compressed.Length*8}");
+            ZPackage z = new ZPackage(compressed);
+            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, "ShareExploration", z);
+            
+            AddString(Chat.instance, "Finished sharing map!");
+            busy = false;
+        }
+
+        public static void SendPin(Minimap.PinData pin, string text)
+        {
+            if (pin.m_type == Minimap.PinType.Player) return;
+            if (pin.m_type == Minimap.PinType.Ping) return;
+            if (pin.m_type == Minimap.PinType.Bed) return;
+            if (pin.m_type == Minimap.PinType.Death)
+            {
+                if (!Settings.ShareDeathMarkers.Value) return;
+                if (pin.m_name == string.Empty) text = Player.m_localPlayer.GetPlayerName() + "'s Gravestone";
+            }
+            ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, "PlayerAddedPin", pin.m_pos, pin.m_type.ToString(), text, Player.m_localPlayer.GetPlayerName());
+        }
+
+        public static bool SimilarPinExists(Vector3 pos, Minimap.PinType type, List<Minimap.PinData> pins, out Minimap.PinData match)
+        {
+            foreach (Minimap.PinData pinData in pins)
+            {
+                if (Utils.DistanceXZ(pos, pinData.m_pos) < 1f)
+                {
+                    match = pinData;
+                    return true;
+                }
+            }
+            match = null;
+            return false;
+        }
+
+        public static void AddString(Chat __instance, string text)
+        {
+            var buffer = __instance.GetPrivateField<List<string>>("m_chatBuffer");
+            buffer.Add(text);
+            while (buffer.Count > 15)
+            {
+                buffer.RemoveAt(0);
+            }
+            __instance.InvokeMethod("UpdateChat");
+        }
+    }
+}
