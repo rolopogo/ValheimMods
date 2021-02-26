@@ -23,6 +23,17 @@ namespace ExploreTogether.Patches
         [HarmonyPatch(typeof(Minimap), "ScreenToWorldPoint", new Type[] { typeof(Vector3) })]
         public static Vector3 ScreenToWorldPoint(object instance, Vector3 screenPos) => throw new NotImplementedException();
 
+
+        [HarmonyPatch(typeof(Minimap), "AddPin")]
+        [HarmonyPrefix]
+        private static void Minimap_Awake(ref Minimap __instance, List<Minimap.PinData> ___m_pins, Vector3 pos, Minimap.PinType type, string name, bool save, bool isChecked)
+        {
+            if(Plugin.SimilarPinExists(pos, type, ___m_pins, out var match))
+            {
+                __instance.RemovePin(match);
+            }
+        }
+
         [HarmonyPatch(typeof(Minimap), "UpdateExplore")]
         [HarmonyPrefix]
         private static bool Minimap_UpdateExplore(ref Minimap __instance, Player player, float ___m_exploreTimer, float ___m_exploreInterval, float ___m_exploreRadius, List<ZNet.PlayerInfo> ___m_tempPlayerInfo)
@@ -70,9 +81,9 @@ namespace ExploreTogether.Patches
                 var text = string.Empty;
                 if (Settings.MoreDetailsOnDeathMarkers.Value)
                     text = prof.GetName() + "\n" + DateTime.Now.ToString("hh:mm");
-                __instance.AddPin(prof.GetDeathPoint(), Minimap.PinType.Death, text, true, false);
+                var newpin = __instance.AddPin(prof.GetDeathPoint(), Minimap.PinType.Death, text, true, false);
                 if (Settings.ShareDeathMarkers.Value)
-                    Plugin.SendPin(___m_deathPin, text);
+                    Plugin.SendPin(newpin, text);
             }
         }
 
