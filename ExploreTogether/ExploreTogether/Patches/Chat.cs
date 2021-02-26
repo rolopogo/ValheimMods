@@ -19,8 +19,8 @@ namespace ExploreTogether.Patches
         [HarmonyPostfix]
         private static void Chat_Awake(Chat __instance)
         {
-            Plugin.AddString(__instance, "/shareMap - Share your current map exploration progress with other players");
-            Plugin.AddString(__instance, "/sharePins - Share all of your map pins with other players");
+            Plugin.AddString("/shareMap - Share your current map exploration progress with other players");
+            Plugin.AddString("/sharePins - Share all of your map pins with other players");
         }
         
         [HarmonyPatch(typeof(Chat), "InputText")]
@@ -33,28 +33,21 @@ namespace ExploreTogether.Patches
                 
                 if (text.ToLower().StartsWith("/sharemap"))
                 {
-                    if (!Plugin.busy)
-                        Plugin.ShareMap();
-                    else
-                        Plugin.AddString(__instance, "Can't share map just yet!");
+                    Plugin.ShareMap();
                     return false;
                 }
 
                 if (text.ToLower().StartsWith("/sharepins"))
                 {
-                    var pins = Minimap.instance.GetPrivateField<List<Minimap.PinData>>("m_pins").ToArray();
-                    foreach (var pin in pins)
-                    {
-                        var name = pin.m_name;
-                        
-                        Plugin.SendPin(pin, name);
-                    }
+                    Plugin.SharePins();
                     return false;
                 }
             }
             return true;
         }
+
         
+
         [HarmonyPatch(typeof(Chat), "SendPing")]
         [HarmonyPrefix]
         private static bool Chat_SendPingPatch(Vector3 position)

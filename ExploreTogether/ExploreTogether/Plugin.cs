@@ -14,7 +14,7 @@ using WeylandMod.Utilities;
 namespace ExploreTogether
 {
     //[BepInProcess("valheim.exe")]
-    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.0.0.0")]
+    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.1.0.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool busy { get; private set; }
@@ -35,18 +35,24 @@ namespace ExploreTogether
 
         public static void ShareMap()
         {
+            if (busy)
+            {
+                AddString("Can't share map just yet!");
+                return;
+            }
+            busy = true;
             var m_explored = Minimap.instance.GetPrivateField<bool[]>("m_explored");
             var compressed = MapCompression.Compress(m_explored);
-            Plugin.logger.LogDebug($"{m_explored.Length}=>{compressed.Length*8}");
             ZPackage z = new ZPackage(compressed);
             ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, "ShareExploration", z);
             
-            AddString(Chat.instance, "Finished sharing map!");
+            AddString("Finished sharing map!");
             busy = false;
         }
 
         public static void SendPin(Minimap.PinData pin, string text)
         {
+            if (pin == null) return;
             if (pin.m_type == Minimap.PinType.Player) return;
             if (pin.m_type == Minimap.PinType.Ping) return;
             if (pin.m_type == Minimap.PinType.Bed) return;
@@ -62,7 +68,7 @@ namespace ExploreTogether
         {
             foreach (Minimap.PinData pinData in pins)
             {
-                if (Utils.DistanceXZ(pos, pinData.m_pos) < 1f)
+                if (Utils.DistanceXZ(pos, pinData.m_pos) < 1f && type == pinData.m_type)
                 {
                     match = pinData;
                     return true;
@@ -72,15 +78,26 @@ namespace ExploreTogether
             return false;
         }
 
-        public static void AddString(Chat __instance, string text)
+        public static void AddString(string text)
         {
-            var buffer = __instance.GetPrivateField<List<string>>("m_chatBuffer");
+            var buffer = Chat.instance.GetPrivateField<List<string>>("m_chatBuffer");
             buffer.Add(text);
             while (buffer.Count > 15)
             {
                 buffer.RemoveAt(0);
             }
-            __instance.InvokeMethod("UpdateChat");
+            Chat.instance.InvokeMethod("UpdateChat");
+        }
+
+        public static void SharePins()
+        {
+            var pins = Minimap.instance.GetPrivateField<List<Minimap.PinData>>("m_pins").ToArray();
+            foreach (var pin in pins)
+            {
+                var name = pin.m_name;
+
+                SendPin(pin, name);
+            }
         }
     }
 }

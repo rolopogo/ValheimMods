@@ -60,6 +60,17 @@ namespace ExploreTogether.Patches
                             }
                     }
                 }
+
+                if (Enum.TryParse(Settings.ShareMapKey.Value, out KeyCode mapKey))
+                    if(Input.GetKeyDown(mapKey))
+                        Plugin.ShareMap();
+
+
+                if (Enum.TryParse(Settings.SharePinsKey.Value, out KeyCode pinKey))
+                    if(Input.GetKeyDown(pinKey))
+                        Plugin.SharePins();
+                
+
             }
         }
     }

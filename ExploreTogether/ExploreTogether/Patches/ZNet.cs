@@ -44,7 +44,7 @@ namespace ExploreTogether.Patches
 
         private static void RPC_PlayerAddedPin(long sender, Vector3 pos, string type, string name, string player)
         {
-            Plugin.logger.LogDebug(nameof(RPC_PlayerAddedPin));
+            Plugin.logger.LogDebug($"{nameof(RPC_PlayerAddedPin)}: {player} shared {name} at ({pos.x},{pos.z})");
             if (Settings.SharePinsWithOtherPlayers.Value)
             {
                 Minimap.PinType pinType = (Minimap.PinType)Enum.Parse(typeof(Minimap.PinType), type);
@@ -55,13 +55,13 @@ namespace ExploreTogether.Patches
                 {
                     if (match.m_name != name)
                     {
-                        Plugin.AddString(Chat.instance, $"{player} changed the name pin: \"{match.m_name}\" at ({Mathf.RoundToInt(pos.x)}, {Mathf.RoundToInt(pos.y)}) to {name}.");
+                        Plugin.AddString($"{player} changed the name pin: \"{match.m_name}\" at ({Mathf.RoundToInt(pos.x)}, {Mathf.RoundToInt(pos.y)}) to {name}.");
                         match.m_name = name;
                     }
                 }
                 else
                 {
-                    Plugin.AddString(Chat.instance, $"{player} added pin: \"{name}\" at ({Mathf.RoundToInt(pos.x)}, {Mathf.RoundToInt(pos.y)}).");
+                    Plugin.AddString($"{player} added pin: \"{name}\" at ({Mathf.RoundToInt(pos.x)}, {Mathf.RoundToInt(pos.y)}).");
                     Minimap.instance.AddPin(pos, pinType, name, true, false);
                 }
             }
@@ -69,7 +69,7 @@ namespace ExploreTogether.Patches
 
         private static void RPC_ShareExploration(long sender, ZPackage z)
         {
-            
+            Plugin.logger.LogDebug($"{nameof(RPC_ShareExploration)}: Received map data from {sender}");
             if (Settings.OthersRevealMap.Value)
             {
                 var explored = z.GetArray();

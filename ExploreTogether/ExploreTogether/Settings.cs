@@ -17,6 +17,8 @@ namespace ExploreTogether
         public static ConfigEntry<bool> PersistentPings { get; private set; }
         public static ConfigEntry<bool> PingWhereLooking { get; private set; }
         public static ConfigEntry<string> PingKey { get; private set; }
+        public static ConfigEntry<string> ShareMapKey { get; private set; }
+        public static ConfigEntry<string> SharePinsKey { get; private set; }
         public static ConfigEntry<bool> ShareDeathMarkers { get; private set; }
         public static ConfigEntry<bool> PersistentDeathMarkers { get; private set; }
         public static ConfigEntry<bool> MoreDetailsOnDeathMarkers { get; private set; }
@@ -57,6 +59,16 @@ namespace ExploreTogether
                 "PingInputKey",
                 "T",
                 "The keybind to trigger a ping where you are looking");
+
+            ShareMapKey = Plugin.Instance.Config.Bind("Minimap",
+                "PingInputKey",
+                "F10",
+                "The keybind to trigger sharing your map exploration with other players");
+
+            SharePinsKey = Plugin.Instance.Config.Bind("Minimap",
+                "SharePinsKey",
+                "F9",
+                "The keybind to trigger sharing pins with other players");
 
             ShareDeathMarkers = Plugin.Instance.Config.Bind("Pins",
                 "ShareDeathMarkers",
