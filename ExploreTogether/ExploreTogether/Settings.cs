@@ -61,7 +61,7 @@ namespace ExploreTogether
                 "The keybind to trigger a ping where you are looking");
 
             ShareMapKey = Plugin.Instance.Config.Bind("Minimap",
-                "PingInputKey",
+                "ShareMapKey",
                 "F10",
                 "The keybind to trigger sharing your map exploration with other players");
 
