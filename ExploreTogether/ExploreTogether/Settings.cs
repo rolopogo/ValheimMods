@@ -22,7 +22,9 @@ namespace ExploreTogether
         public static ConfigEntry<bool> ShareDeathMarkers { get; private set; }
         public static ConfigEntry<bool> PersistentDeathMarkers { get; private set; }
         public static ConfigEntry<bool> MoreDetailsOnDeathMarkers { get; private set; }
-        
+        public static ConfigEntry<bool> ShowBoats { get; private set; }
+        public static ConfigEntry<bool> ShowCarts { get; private set; }
+
         public static void Init()
         {
             OthersRevealMap = Plugin.Instance.Config.Bind("Minimap",
@@ -76,7 +78,7 @@ namespace ExploreTogether
                 "Share your death marker with other players"
                 );
 
-            ShareDeathMarkers = Plugin.Instance.Config.Bind("Pins",
+            PersistentDeathMarkers = Plugin.Instance.Config.Bind("Pins",
                 "PersistentDeathMarkers",
                 true,
                 "Keep your death markers, even if you die again and again"
@@ -87,6 +89,20 @@ namespace ExploreTogether
                 true,
                 "Tag your death marker with your name and time of death"
                 );
+
+            //ShowBoats =
+            //MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
+            //    "ShowBoatsOnMap",
+            //    true,
+            //    "Show boats as pins on your map"
+            //    );
+
+            //ShowCarts =
+            //MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
+            //    "ShowCartsOnMap",
+            //    true,
+            //    "Show carts as pins on your map"
+            //    );
         }
     }
 }

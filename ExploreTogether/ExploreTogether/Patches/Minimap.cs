@@ -23,20 +23,21 @@ namespace ExploreTogether.Patches
         [HarmonyPatch(typeof(Minimap), "ScreenToWorldPoint", new Type[] { typeof(Vector3) })]
         public static Vector3 ScreenToWorldPoint(object instance, Vector3 screenPos) => throw new NotImplementedException();
 
-
         [HarmonyPatch(typeof(Minimap), "AddPin")]
         [HarmonyPrefix]
-        private static void Minimap_Awake(ref Minimap __instance, List<Minimap.PinData> ___m_pins, Vector3 pos, Minimap.PinType type, string name, bool save, bool isChecked)
+        private static bool Minimap_AddPin(ref Minimap __instance, List<Minimap.PinData> ___m_pins, Vector3 pos, Minimap.PinType type, string name, bool save, bool isChecked)
         {
-            if(Plugin.SimilarPinExists(pos, type, ___m_pins, out var match))
+            // Skip readding stacked death markers
+            if (type == Minimap.PinType.Death && Plugin.SimilarPinExists(pos, type, ___m_pins, out var match) && save)
             {
-                __instance.RemovePin(match);
+                return false;
             }
+            return true;
         }
 
         [HarmonyPatch(typeof(Minimap), "UpdateExplore")]
         [HarmonyPrefix]
-        private static bool Minimap_UpdateExplore(ref Minimap __instance, Player player, float ___m_exploreTimer, float ___m_exploreInterval, float ___m_exploreRadius, List<ZNet.PlayerInfo> ___m_tempPlayerInfo)
+        private static bool Minimap_UpdateExplore(ref Minimap __instance, float dt, Player player, float ___m_exploreTimer, float ___m_exploreInterval, float ___m_exploreRadius, List<ZNet.PlayerInfo> ___m_tempPlayerInfo)
         {
             if (Settings.OthersRevealMap.Value)
             {
@@ -73,7 +74,7 @@ namespace ExploreTogether.Patches
 
         [HarmonyPatch(typeof(Minimap), "UpdateProfilePins")]
         [HarmonyPrefix]
-        private static void Minimap_UpdateProfilePins(Minimap __instance, ref Minimap.PinData ___m_deathPin)
+        private static bool Minimap_UpdateProfilePins(Minimap __instance, ref Minimap.PinData ___m_deathPin)
         {
             PlayerProfile prof = Game.instance.GetPlayerProfile();
             if (prof.HaveDeathPoint() && ___m_deathPin == null)
@@ -82,36 +83,20 @@ namespace ExploreTogether.Patches
                 if (Settings.MoreDetailsOnDeathMarkers.Value)
                     text = prof.GetName() + "\n" + DateTime.Now.ToString("hh:mm");
                 var newpin = __instance.AddPin(prof.GetDeathPoint(), Minimap.PinType.Death, text, true, false);
+                ___m_deathPin = newpin;
                 if (Settings.ShareDeathMarkers.Value)
                     Plugin.SendPin(newpin, text);
             }
+            return true;
         }
 
-        //[HarmonyPatch(typeof(Minimap), "UpdateNameInput")]
-        //[HarmonyPrefix]
-        //private static bool Minimap_UpdateNameInput(Minimap __instance, Minimap.PinData ___m_namePin, bool ___m_wasFocused)
-        //{
-        //    if (Settings.SharePinsWithOtherPlayers.Value)
-        //    {
-        //        if (__instance.m_nameInput.isFocused)
-        //        {
-        //            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        //            {
-        //                string text = __instance.m_nameInput.text;
-        //                text = text.Replace('$', ' ');
-        //                text = text.Replace('<', ' ');
-        //                text = text.Replace('>', ' ');
-
-        //                if (Player.m_localPlayer)
-        //                {
-        //                    Plugin.SendPin(___m_namePin, text);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
-
-        
+        [HarmonyPatch(typeof(Minimap), "RemovePin", new Type[] {typeof(Minimap.PinData) })]
+        [HarmonyPrefix]
+        private static bool Minimap_RemovePin(Minimap.PinData pin, Minimap.PinData ___m_deathPin)
+        {
+            if(Settings.PersistentDeathMarkers.Value && ___m_deathPin == pin)
+                return false;
+            return true;
+        }
     }
 }
