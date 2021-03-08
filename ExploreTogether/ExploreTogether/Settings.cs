@@ -21,6 +21,7 @@ namespace ExploreTogether
         public static ConfigEntry<string> SharePinsKey { get; private set; }
         public static ConfigEntry<bool> ShareDeathMarkers { get; private set; }
         public static ConfigEntry<bool> PersistentDeathMarkers { get; private set; }
+        public static ConfigEntry<float> SharedPinOverlapDistance { get; private set; }
         public static ConfigEntry<bool> MoreDetailsOnDeathMarkers { get; private set; }
         public static ConfigEntry<bool> ShowBoats { get; private set; }
         public static ConfigEntry<bool> ShowCarts { get; private set; }
@@ -83,12 +84,20 @@ namespace ExploreTogether
                 true,
                 "Keep your death markers, even if you die again and again"
                 );
-            
+
+            SharedPinOverlapDistance = Plugin.Instance.Config.Bind("Pins",
+                "SharedPinOverlapDistance",
+                1f,
+                "The distance around existing pins in which received pins will not be added (higher = less overlapping)"
+                );
+
             MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
                 "MoreDetailsOnDeathMarkers",
                 true,
                 "Tag your death marker with your name and time of death"
                 );
+
+            
 
             //ShowBoats =
             //MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",

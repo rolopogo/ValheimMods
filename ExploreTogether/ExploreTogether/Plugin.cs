@@ -14,7 +14,7 @@ using WeylandMod.Utilities;
 namespace ExploreTogether
 {
     //[BepInProcess("valheim.exe")]
-    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.1.0.0")]
+    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool busy { get; private set; }
@@ -68,7 +68,7 @@ namespace ExploreTogether
         {
             foreach (Minimap.PinData pinData in pins)
             {
-                if (Utils.DistanceXZ(pos, pinData.m_pos) < 1f && type == pinData.m_type)
+                if (Utils.DistanceXZ(pos, pinData.m_pos) < Settings.SharedPinOverlapDistance.Value && type == pinData.m_type)
                 {
                     match = pinData;
                     return true;
