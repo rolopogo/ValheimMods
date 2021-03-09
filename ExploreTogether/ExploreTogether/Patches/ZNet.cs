@@ -1,4 +1,4 @@
-﻿using ExploreAsOne.Utilities;
+﻿using RoloPogo.Utilities;
 using HarmonyLib;
 using System;
 using System.Collections;
@@ -13,11 +13,9 @@ namespace ExploreTogether.Patches
 {
     class ZNet_Patch
     {
-
         [HarmonyReversePatch]
         [HarmonyPatch(typeof(ZNet), "GetOtherPublicPlayers", new Type[] { typeof(List<ZNet.PlayerInfo>) })]
         public static void GetOtherPublicPlayers(object instance, List<ZNet.PlayerInfo> playerList) => throw new NotImplementedException();
-
 
         [HarmonyPatch(typeof(ZNet), "Awake")]
         [HarmonyPostfix]

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace ExploreAsOne.Utilities
+namespace RoloPogo.Utilities
 {
     public static class ReflectionUtil
     {

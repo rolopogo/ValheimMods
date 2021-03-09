@@ -1,4 +1,4 @@
-﻿using ExploreAsOne.Utilities;
+﻿using RoloPogo.Utilities;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -69,7 +69,6 @@ namespace ExploreTogether.Patches
                 if (Enum.TryParse(Settings.SharePinsKey.Value, out KeyCode pinKey))
                     if(Input.GetKeyDown(pinKey))
                         Plugin.SharePins();
-                
 
             }
         }

@@ -97,21 +97,19 @@ namespace ExploreTogether
                 "Tag your death marker with your name and time of death"
                 );
 
-            
+            ShowBoats =
+            MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
+                "ShowBoatsOnMap",
+                true,
+                "Show boats as pins on your map"
+                );
 
-            //ShowBoats =
-            //MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
-            //    "ShowBoatsOnMap",
-            //    true,
-            //    "Show boats as pins on your map"
-            //    );
-
-            //ShowCarts =
-            //MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
-            //    "ShowCartsOnMap",
-            //    true,
-            //    "Show carts as pins on your map"
-            //    );
+            ShowCarts =
+            MoreDetailsOnDeathMarkers = Plugin.Instance.Config.Bind("Pins",
+                "ShowCartsOnMap",
+                true,
+                "Show carts as pins on your map"
+                );
         }
     }
 }

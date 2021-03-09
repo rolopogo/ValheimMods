@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
-using ExploreAsOne.Utilities;
+using RoloPogo.Utilities;
 using UnityEngine.EventSystems;
 using System.Collections;
 

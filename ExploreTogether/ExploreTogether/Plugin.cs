@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BepInEx;
-using ExploreAsOne.Utilities;
+using RoloPogo.Utilities;
 using ExploreTogether.Patches;
 using HarmonyLib;
 using UnityEngine;
@@ -14,7 +14,7 @@ using WeylandMod.Utilities;
 namespace ExploreTogether
 {
     //[BepInProcess("valheim.exe")]
-    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.1.3.0")]
+    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.2.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool busy { get; private set; }
@@ -26,7 +26,10 @@ namespace ExploreTogether
         void Awake()
         {
             Instance = this;
+
             Settings.Init();
+            Assets.Init();
+
             Harmony.CreateAndPatchAll(typeof(Minimap_Patch), "com.rolopogo.plugins.exploretogether");
             Harmony.CreateAndPatchAll(typeof(Player_Patch), "com.rolopogo.plugins.exploretogether");
             Harmony.CreateAndPatchAll(typeof(Chat_Patch), "com.rolopogo.plugins.exploretogether");

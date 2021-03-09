@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using RoloPogo.Utilities;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,13 @@ namespace ExploreTogether.Patches
 {
     class Minimap_Patch
     {
+        static List<Minimap.PinData> cartPins;
+        static List<Minimap.PinData> boatPins;
+        const string CartPrefab = "Cart";
+        const string RaftPrefabName = "Raft";
+        const string KarvePrefabName = "Karve";
+        const string LongboatPrefabName = "VikingShip";
+
         [HarmonyReversePatch]
         [HarmonyPatch(typeof(Minimap), "Explore", new Type[] { typeof(Vector3), typeof(float) })]
         public static void Explore(object instance, Vector3 p, float radius) => throw new NotImplementedException();
@@ -86,6 +94,72 @@ namespace ExploreTogether.Patches
                 ___m_deathPin = newpin;
                 if (Settings.ShareDeathMarkers.Value)
                     Plugin.SendPin(newpin, text);
+            }
+
+            if (Settings.ShowCarts.Value)
+            {
+                List<ZDO> cartZDOs = new List<ZDO>();
+                ZDOMan.instance.GetAllZDOsWithPrefab(CartPrefab, cartZDOs);
+
+                if (cartPins == null) cartPins = new List<Minimap.PinData>();
+
+                if (cartPins.Count != cartZDOs.Count)
+                {
+                    foreach (var pin in cartPins)
+                    {
+                        Minimap.instance.RemovePin(pin);
+                    }
+                    cartPins.Clear();
+                    for (int i = 0; i < cartZDOs.Count; i++)
+                    {
+                        var newPin = Minimap.instance.AddPin(Vector3.zero, Minimap.PinType.Icon1, string.Empty, false, false);
+                        newPin.m_icon = Assets.cartSprite;
+                        cartPins.Add(newPin);
+                    }
+                }
+                for (int i = 0; i < cartZDOs.Count; i++)
+                {
+                    cartPins[i].m_pos = cartZDOs[i].GetPosition();
+                }
+            }
+            if (Settings.ShowBoats.Value)
+            {
+                List<ZDO> raftZDOs = new List<ZDO>();
+                List<ZDO> karveZDOs = new List<ZDO>();
+                List<ZDO> longboatZDOs = new List<ZDO>();
+
+                ZDOMan.instance.GetAllZDOsWithPrefab(RaftPrefabName, raftZDOs);
+                ZDOMan.instance.GetAllZDOsWithPrefab(KarvePrefabName, karveZDOs);
+                ZDOMan.instance.GetAllZDOsWithPrefab(LongboatPrefabName, longboatZDOs);
+
+                var boatZDOs = raftZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_raft")))
+                    .Concat(karveZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_karve"))))
+                    .Concat(longboatZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_longship"))))
+                    .ToList()
+                    ;
+
+                if (boatPins == null) boatPins = new List<Minimap.PinData>();
+
+                if (boatPins.Count != boatZDOs.Count)
+                {
+                    foreach (var pin in boatPins)
+                    {
+                        Minimap.instance.RemovePin(pin);
+                    }
+                    boatPins.Clear();
+
+                    for (int i = 0; i < boatZDOs.Count; i++)
+                    {
+                        var newPin = Minimap.instance.AddPin(Vector3.zero, Minimap.PinType.Icon1, boatZDOs[i].Item2, false, false);
+                        newPin.m_icon = Assets.boatSprite;
+                        boatPins.Add(newPin);
+                    }
+                }
+                for (int i = 0; i < boatZDOs.Count; i++)
+                {
+                    boatPins[i].m_pos = boatZDOs[i].Item1.GetPosition();
+                    boatPins[i].m_name = boatZDOs[i].Item2;
+                }
             }
             return true;
         }
