@@ -18,6 +18,12 @@ namespace ExploreTogether.Patches
         const string RaftPrefabName = "Raft";
         const string KarvePrefabName = "Karve";
         const string LongboatPrefabName = "VikingShip";
+        static List<ZDO> cartZDOs;
+        static List<ZDO> raftZDOs;
+        static List<ZDO> karveZDOs;
+        static List<ZDO> longboatZDOs;
+        static int index = 0;
+        static int sectorsPerFrame = 400;
 
         [HarmonyReversePatch]
         [HarmonyPatch(typeof(Minimap), "Explore", new Type[] { typeof(Vector3), typeof(float) })]
@@ -96,10 +102,16 @@ namespace ExploreTogether.Patches
                     Plugin.SendPin(newpin, text);
             }
 
+            bool done = false;
+
             if (Settings.ShowCarts.Value)
             {
-                List<ZDO> cartZDOs = new List<ZDO>();
-                ZDOMan.instance.GetAllZDOsWithPrefab(CartPrefab, cartZDOs);
+                if(cartZDOs == null)cartZDOs = new List<ZDO>();
+                var cartIndex = index;
+                while(!done && cartIndex - index < sectorsPerFrame)
+                    done = done || ZDOMan.instance.GetAllZDOsWithPrefabIterative(CartPrefab, cartZDOs, ref cartIndex);
+
+                cartZDOs = cartZDOs.Distinct().ToList();
 
                 if (cartPins == null) cartPins = new List<Minimap.PinData>();
 
@@ -117,6 +129,7 @@ namespace ExploreTogether.Patches
                         cartPins.Add(newPin);
                     }
                 }
+                Debug.Log(cartZDOs.Count + " " + cartPins.Count);
                 for (int i = 0; i < cartZDOs.Count; i++)
                 {
                     cartPins[i].m_pos = cartZDOs[i].GetPosition();
@@ -124,13 +137,27 @@ namespace ExploreTogether.Patches
             }
             if (Settings.ShowBoats.Value)
             {
-                List<ZDO> raftZDOs = new List<ZDO>();
-                List<ZDO> karveZDOs = new List<ZDO>();
-                List<ZDO> longboatZDOs = new List<ZDO>();
+                if(raftZDOs==null) raftZDOs = new List<ZDO>();
+                if (karveZDOs == null) karveZDOs = new List<ZDO>();
+                if (longboatZDOs == null) longboatZDOs = new List<ZDO>();
 
-                ZDOMan.instance.GetAllZDOsWithPrefab(RaftPrefabName, raftZDOs);
-                ZDOMan.instance.GetAllZDOsWithPrefab(KarvePrefabName, karveZDOs);
-                ZDOMan.instance.GetAllZDOsWithPrefab(LongboatPrefabName, longboatZDOs);
+                raftZDOs.RemoveAll(x => x == null || !x.IsValid());
+                karveZDOs.RemoveAll(x => x == null || !x.IsValid());
+                longboatZDOs.RemoveAll(x => x == null || !x.IsValid());
+
+                var raftIndex = index;
+                var karveIndex = index;
+                var longIndex = index;
+                while (!done && raftIndex - index < sectorsPerFrame)
+                {
+                    done = done || ZDOMan.instance.GetAllZDOsWithPrefabIterative(RaftPrefabName, raftZDOs, ref raftIndex);                    
+                    ZDOMan.instance.GetAllZDOsWithPrefabIterative(KarvePrefabName, karveZDOs, ref karveIndex);
+                    ZDOMan.instance.GetAllZDOsWithPrefabIterative(LongboatPrefabName, longboatZDOs, ref longIndex);
+                }
+
+                raftZDOs = raftZDOs.Distinct().ToList();
+                karveZDOs = karveZDOs.Distinct().ToList();
+                longboatZDOs = longboatZDOs.Distinct().ToList();
 
                 var boatZDOs = raftZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_raft")))
                     .Concat(karveZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_karve"))))
@@ -161,6 +188,12 @@ namespace ExploreTogether.Patches
                     boatPins[i].m_name = boatZDOs[i].Item2;
                 }
             }
+
+            if (done)
+                index = 0;
+            else
+                index+=sectorsPerFrame;
+
             return true;
         }
 
