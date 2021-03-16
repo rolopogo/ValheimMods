@@ -37,6 +37,10 @@ namespace ExploreTogether.Patches
         [HarmonyPatch(typeof(Minimap), "ScreenToWorldPoint", new Type[] { typeof(Vector3) })]
         public static Vector3 ScreenToWorldPoint(object instance, Vector3 screenPos) => throw new NotImplementedException();
 
+        [HarmonyReversePatch]
+        [HarmonyPatch(typeof(Minimap), "GetClosestPin", new Type[] { typeof(Vector3), typeof(float) })]
+        public static Minimap.PinData GetClosestPin(object instance, Vector3 pos, float radius) => throw new NotImplementedException();
+
         [HarmonyPatch(typeof(Minimap), "AddPin")]
         [HarmonyPrefix]
         private static bool Minimap_AddPin(ref Minimap __instance, List<Minimap.PinData> ___m_pins, Vector3 pos, Minimap.PinType type, string name, bool save, bool isChecked)
@@ -129,7 +133,7 @@ namespace ExploreTogether.Patches
                         cartPins.Add(newPin);
                     }
                 }
-                Debug.Log(cartZDOs.Count + " " + cartPins.Count);
+                //Debug.Log(cartZDOs.Count + " " + cartPins.Count);
                 for (int i = 0; i < cartZDOs.Count; i++)
                 {
                     cartPins[i].m_pos = cartZDOs[i].GetPosition();
@@ -193,6 +197,28 @@ namespace ExploreTogether.Patches
                 index = 0;
             else
                 index+=sectorsPerFrame;
+
+            return true;
+        }
+
+
+        [HarmonyPatch(typeof(Minimap), "OnMapMiddleClick", new Type[] {typeof(UIInputHandler)})]
+        [HarmonyPrefix]
+        private static bool Minimap_OnMapMiddleClick(UIInputHandler handler, Minimap __instance, float ___m_removeRadius, float ___m_largeZoom) {
+            Vector3 pos = ScreenToWorldPoint(__instance, Input.mousePosition);
+            if (Settings.ShareIndividualPin.Value)
+            {
+                if (Enum.TryParse(Settings.ShareIndividualPinKey.Value, out KeyCode key))
+                {
+                    if (Input.GetKey(key))
+                    {
+                        Minimap.PinData closestPin = GetClosestPin(__instance, pos, ___m_removeRadius * (___m_largeZoom * 2f));
+                        Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
+                        Plugin.SendPin(closestPin, closestPin.m_name);
+                        return Settings.ShowPingWhenSharingIndividualPin.Value;
+                    }
+                }
+            }
 
             return true;
         }
