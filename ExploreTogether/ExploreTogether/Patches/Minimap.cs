@@ -133,7 +133,7 @@ namespace ExploreTogether.Patches
                         cartPins.Add(newPin);
                     }
                 }
-                //Debug.Log(cartZDOs.Count + " " + cartPins.Count);
+                Debug.Log(cartZDOs.Count + " " + cartPins.Count);
                 for (int i = 0; i < cartZDOs.Count; i++)
                 {
                     cartPins[i].m_pos = cartZDOs[i].GetPosition();
