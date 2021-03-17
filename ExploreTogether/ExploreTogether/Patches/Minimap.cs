@@ -213,9 +213,12 @@ namespace ExploreTogether.Patches
                     if (Input.GetKey(key))
                     {
                         Minimap.PinData closestPin = GetClosestPin(__instance, pos, ___m_removeRadius * (___m_largeZoom * 2f));
-                        Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
-                        Plugin.SendPin(closestPin, closestPin.m_name);
-                        return Settings.ShowPingWhenSharingIndividualPin.Value;
+                        if (closestPin != null)
+                        {
+                            Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
+                            Plugin.SendPin(closestPin, closestPin.m_name);
+                            return Settings.ShowPingWhenSharingIndividualPin.Value;
+                        }
                     }
                 }
             }
