@@ -13,9 +13,11 @@ namespace Gizmo
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
+            var placementAnglePatched = false;
             var codes = new List<CodeInstruction>(instructions);
             for (var i = 0; i < codes.Count; i++)
             {
+                if(!placementAnglePatched)
                 if (codes[i].opcode == OpCodes.Callvirt &&
                     codes[i + 1].opcode == OpCodes.Ldc_R4 &&
                     codes[i + 2].opcode == OpCodes.Ldc_R4 &&
@@ -29,7 +31,10 @@ namespace Gizmo
 
                 {
                     codes[i + 8] = CodeInstruction.Call(typeof(Plugin), "GetPlacementAngle");
+                        placementAnglePatched = true;
                 }
+
+
             }
             return codes.AsEnumerable();
         }

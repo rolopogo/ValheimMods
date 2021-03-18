@@ -1,10 +1,7 @@
-﻿using RoloPogo.Utilities;
-using HarmonyLib;
+﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -206,8 +203,7 @@ namespace ExploreTogether.Patches
 
             return true;
         }
-
-
+        
         [HarmonyPatch(typeof(Minimap), "OnMapMiddleClick", new Type[] {typeof(UIInputHandler)})]
         [HarmonyPrefix]
         private static bool Minimap_OnMapMiddleClick(UIInputHandler handler, Minimap __instance, float ___m_removeRadius, float ___m_largeZoom) {
@@ -226,8 +222,9 @@ namespace ExploreTogether.Patches
                 Minimap.PinData closestPin = GetClosestPin(__instance, pos, ___m_removeRadius * (___m_largeZoom * 2f));
                 if (closestPin != null)
                 {
-                    Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
                     Plugin.SendPin(closestPin, closestPin.m_name);
+
+                    Plugin.AddString($"Shared {closestPin.m_name}");
                     return Settings.ShowPingWhenSharingIndividualPin.Value;
                 }
             }

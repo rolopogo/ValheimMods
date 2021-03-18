@@ -1,4 +1,4 @@
-﻿// Shamelessly stolen from glcoder without permission
+﻿// Shamelessly stolen from WeylandMod without permission
 // Source https://github.com/WeylandMod/WeylandMod/blob/main/assembly_valheim.WeylandMod.mm/Utils/MapCompression.cs
 
 using System;

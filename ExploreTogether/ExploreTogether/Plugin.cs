@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using BepInEx;
 using RoloPogo.Utilities;
 using ExploreTogether.Patches;
@@ -100,7 +95,10 @@ namespace ExploreTogether
                 var name = pin.m_name;
 
                 SendPin(pin, name);
+
             }
+
+            AddString($"Shared {pins.Length} pins");
         }
     }
 }
