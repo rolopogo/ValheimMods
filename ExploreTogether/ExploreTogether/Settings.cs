@@ -20,6 +20,7 @@ namespace ExploreTogether
         public static ConfigEntry<string> ShareMapKey { get; private set; }
         public static ConfigEntry<string> SharePinsKey { get; private set; }
         public static ConfigEntry<bool> ShareIndividualPin { get; private set; }
+        public static ConfigEntry<bool> ShareIndividualPinRequireKey { get; private set; }
         public static ConfigEntry<string> ShareIndividualPinKey { get; private set; }
         public static ConfigEntry<bool> ShowPingWhenSharingIndividualPin { get; private set; }
         public static ConfigEntry<bool> ShareDeathMarkers { get; private set; }
@@ -80,6 +81,11 @@ namespace ExploreTogether
                 "ShareIndividualPin",
                 true,
                 "Enables the ability to share specific pins by middle clicking while holding a key.");
+
+            ShareIndividualPinRequireKey = Plugin.Instance.Config.Bind("Minimap",
+                "ShareIndividualPinRequireKey",
+                true,
+                "Enables or disables requiring holding a key to share the middle-clicked pin.");
 
             ShareIndividualPinKey = Plugin.Instance.Config.Bind("Minimap",
                 "ShareIndividualPinKey",

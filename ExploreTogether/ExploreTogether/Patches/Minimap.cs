@@ -208,18 +208,21 @@ namespace ExploreTogether.Patches
             Vector3 pos = ScreenToWorldPoint(__instance, Input.mousePosition);
             if (Settings.ShareIndividualPin.Value)
             {
-                if (Enum.TryParse(Settings.ShareIndividualPinKey.Value, out KeyCode key))
+                if (Settings.ShareIndividualPinRequireKey.Value)
                 {
-                    if (Input.GetKey(key))
+                    bool validKey = Enum.TryParse(Settings.ShareIndividualPinKey.Value, out KeyCode key);
+                    if (!validKey || !Input.GetKey(key))
                     {
-                        Minimap.PinData closestPin = GetClosestPin(__instance, pos, ___m_removeRadius * (___m_largeZoom * 2f));
-                        if (closestPin != null)
-                        {
-                            Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
-                            Plugin.SendPin(closestPin, closestPin.m_name);
-                            return Settings.ShowPingWhenSharingIndividualPin.Value;
-                        }
+                        return true;
                     }
+                }
+
+                Minimap.PinData closestPin = GetClosestPin(__instance, pos, ___m_removeRadius * (___m_largeZoom * 2f));
+                if (closestPin != null)
+                {
+                    Debug.Log(string.Format("Sharing pin with name: {0}", closestPin.m_name));
+                    Plugin.SendPin(closestPin, closestPin.m_name);
+                    return Settings.ShowPingWhenSharingIndividualPin.Value;
                 }
             }
 
