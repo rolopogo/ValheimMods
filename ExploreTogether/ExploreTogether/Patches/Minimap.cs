@@ -111,7 +111,10 @@ namespace ExploreTogether.Patches
                 while(!done && cartIndex - index < sectorsPerFrame)
                     done = done || ZDOMan.instance.GetAllZDOsWithPrefabIterative(CartPrefab, cartZDOs, ref cartIndex);
 
-                cartZDOs = cartZDOs.Distinct().ToList();
+                cartZDOs = cartZDOs
+                    .Distinct()
+                    .Where(x => x.GetPosition().y > ZoneSystem.instance.m_waterLevel - 40f)
+                    .ToList();
 
                 if (cartPins == null) cartPins = new List<Minimap.PinData>();
 
@@ -124,12 +127,12 @@ namespace ExploreTogether.Patches
                     cartPins.Clear();
                     for (int i = 0; i < cartZDOs.Count; i++)
                     {
-                        var newPin = Minimap.instance.AddPin(Vector3.zero, Minimap.PinType.Icon1, string.Empty, false, false);
+                        var pos = cartZDOs[i].GetPosition();
+                        var newPin = Minimap.instance.AddPin(pos, Minimap.PinType.Icon1, string.Empty, false, false);
                         newPin.m_icon = Assets.cartSprite;
                         cartPins.Add(newPin);
                     }
                 }
-                Debug.Log(cartZDOs.Count + " " + cartPins.Count);
                 for (int i = 0; i < cartZDOs.Count; i++)
                 {
                     cartPins[i].m_pos = cartZDOs[i].GetPosition();
@@ -162,6 +165,7 @@ namespace ExploreTogether.Patches
                 var boatZDOs = raftZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_raft")))
                     .Concat(karveZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_karve"))))
                     .Concat(longboatZDOs.Select(x => new Tuple<ZDO, string>(x, Localization.instance.Localize("$ship_longship"))))
+                    .Where(x=>x.Item1.GetPosition().y > ZoneSystem.instance.m_waterLevel - 40f)  // Attempt to remove/hide items below the map
                     .ToList()
                     ;
 
@@ -177,7 +181,9 @@ namespace ExploreTogether.Patches
 
                     for (int i = 0; i < boatZDOs.Count; i++)
                     {
-                        var newPin = Minimap.instance.AddPin(Vector3.zero, Minimap.PinType.Icon1, boatZDOs[i].Item2, false, false);
+                        var pos = boatZDOs[i].Item1.GetPosition();
+                        
+                        var newPin = Minimap.instance.AddPin(pos, Minimap.PinType.Icon1, boatZDOs[i].Item2, false, false);
                         newPin.m_icon = Assets.boatSprite;
                         boatPins.Add(newPin);
                     }
