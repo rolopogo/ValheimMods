@@ -19,6 +19,10 @@ namespace ExploreTogether
         public static ConfigEntry<string> PingKey { get; private set; }
         public static ConfigEntry<string> ShareMapKey { get; private set; }
         public static ConfigEntry<string> SharePinsKey { get; private set; }
+        public static ConfigEntry<bool> ShareIndividualPin { get; private set; }
+        public static ConfigEntry<bool> ShareIndividualPinRequireKey { get; private set; }
+        public static ConfigEntry<string> ShareIndividualPinKey { get; private set; }
+        public static ConfigEntry<bool> ShowPingWhenSharingIndividualPin { get; private set; }
         public static ConfigEntry<bool> ShareDeathMarkers { get; private set; }
         public static ConfigEntry<bool> PersistentDeathMarkers { get; private set; }
         public static ConfigEntry<float> SharedPinOverlapDistance { get; private set; }
@@ -72,6 +76,26 @@ namespace ExploreTogether
                 "SharePinsKey",
                 "F9",
                 "The keybind to trigger sharing pins with other players");
+
+            ShareIndividualPin = Plugin.Instance.Config.Bind("Minimap",
+                "ShareIndividualPin",
+                true,
+                "Enables the ability to share specific pins by middle clicking while holding a key.");
+
+            ShareIndividualPinRequireKey = Plugin.Instance.Config.Bind("Minimap",
+                "ShareIndividualPinRequireKey",
+                true,
+                "Enables or disables requiring holding a key to share the middle-clicked pin.");
+
+            ShareIndividualPinKey = Plugin.Instance.Config.Bind("Minimap",
+                "ShareIndividualPinKey",
+                "LeftAlt",
+                "The key that, when held, will allow middle clicking to share individual pins on the map.");
+
+            ShowPingWhenSharingIndividualPin = Plugin.Instance.Config.Bind("Minimap",
+                "ShowPingWhenSharingIndividualPin",
+                true,
+                "Show the map ping when sharing an individual pin.");
 
             ShareDeathMarkers = Plugin.Instance.Config.Bind("Pins",
                 "ShareDeathMarkers",

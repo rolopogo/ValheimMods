@@ -20,6 +20,7 @@ Client side only, no server install required.
 - Pins created by other players will be added to your map *
 - Share your death marker with other players *
 - Tag your death marker with your name and time of death
+- Share specific pins by holding a configurable key and middle clicking pins on the minimap.
 
 #ChangeLog
 ### 1.1.2 - (01/03/2021)
