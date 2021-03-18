@@ -9,7 +9,7 @@ using WeylandMod.Utilities;
 namespace ExploreTogether
 {
     //[BepInProcess("valheim.exe")]
-    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.2.2")]
+    [BepInPlugin("com.rolopogo.plugins.exploretogether","ExploreTogether","1.3.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static bool busy { get; private set; }
