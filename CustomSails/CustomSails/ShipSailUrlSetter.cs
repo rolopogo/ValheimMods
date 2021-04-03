@@ -34,10 +34,10 @@ namespace CustomSails
         {
             if (!Plugin.instance.AllowInput()) return string.Empty;
 
-            if (!PrivateArea.CheckAccess(transform.position, 0f, false))
-            {
-                return "Restricted" + "\n" + GetText();
-            }
+            //if (!PrivateArea.CheckAccess(transform.position, 0f, false))
+            //{
+            //    return "Restricted" + "\n" + GetText();
+            //}
             return Localization.instance.Localize("\n[<color=yellow><b>$KEY_Use</b></color>] Set URL") + "\n" + GetText() ;
         }
         
