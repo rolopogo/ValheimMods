@@ -54,6 +54,8 @@ namespace ExploreTogether
             if (pin.m_type == Minimap.PinType.Player) return;
             if (pin.m_type == Minimap.PinType.Ping) return;
             if (pin.m_type == Minimap.PinType.Bed) return;
+            if (Minimap_Patch.cartPins.Contains(pin)) return;
+            if (Minimap_Patch.boatPins.Contains(pin)) return;
             if (pin.m_type == Minimap.PinType.Death)
             {
                 if (!Settings.ShareDeathMarkers.Value) return;

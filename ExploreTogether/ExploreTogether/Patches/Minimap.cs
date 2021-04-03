@@ -9,8 +9,8 @@ namespace ExploreTogether.Patches
 {
     class Minimap_Patch
     {
-        static List<Minimap.PinData> cartPins;
-        static List<Minimap.PinData> boatPins;
+        public static List<Minimap.PinData> cartPins;
+        public static List<Minimap.PinData> boatPins;
         const string CartPrefab = "Cart";
         const string RaftPrefabName = "Raft";
         const string KarvePrefabName = "Karve";
