@@ -1,13 +1,18 @@
-# CustomSails
+# Basement
 
-Client side only.
+Expand into the earth with this placeable basement
 
-- Set your Sail texture per ship by providing an image url, e.g. https://i.imgur.com/v0wqr0U.png
-- Sail urls are saved and can be seen by anyone using this mod
+* Adds a new item to the misc tab in the hammer build menu, "Basement"
+* Costs 100 stone, 100 wood, and requires a nearby stonecutting table
+* Place basements within basements (up to 5 times)
+* Personalise your basement with unrestricted building inside
 
-Sample Video: https://streamable.com/9giqki
+Sample Videos: 
+* https://streamable.com/t5cizh 
+* https://streamable.com/bix98w
+
 Source: https://github.com/rolopogo/ValheimMods
 
 Install with BepInEx
 
-Copy ExploreTogether.dll into Valheim/BepInEx/plugins
+Copy Basement.dll into Valheim/BepInEx/plugins
