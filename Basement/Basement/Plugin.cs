@@ -12,7 +12,7 @@ using ValheimLib.ODB;
 
 namespace Basement
 {
-    [BepInPlugin("com.rolopogo.Basement", "Basement", "1.0.0")]
+    [BepInPlugin("com.rolopogo.Basement", "Basement", "1.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource Log { get; private set; }

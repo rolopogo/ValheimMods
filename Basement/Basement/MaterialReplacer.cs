@@ -27,15 +27,23 @@ namespace Basement
 
             foreach (Renderer renderer in go.GetComponentsInChildren<Renderer>(true))
             {
-                var matName = renderer.material.name.Replace(" (Instance)", string.Empty);
-                if (originalMaterials.ContainsKey(matName))
+                for (int i = 0; i < renderer.materials.Length; i++)
                 {
-                    renderer.material = originalMaterials[matName];
-                } else
-                {
-                    Plugin.Log.LogInfo("No suitable material found to replace: " + matName);
-                    // Skip over this material in future
-                    originalMaterials[matName] = renderer.material;
+                    if (renderer.materials[i].name.StartsWith("_REPLACE_"))
+                    {
+                        var matName = renderer.material.name.Replace(" (Instance)", string.Empty).Replace("_REPLACE_", "");
+
+                        if (originalMaterials.ContainsKey(matName))
+                        {
+                            renderer.material = originalMaterials[matName];
+                        }
+                        else
+                        {
+                            Plugin.Log.LogInfo("No suitable material found to replace: " + matName);
+                            // Skip over this material in future
+                            originalMaterials[matName] = renderer.material;
+                        }
+                    }
                 }
             }
         }
