@@ -12,22 +12,23 @@ using ValheimLib.ODB;
 
 namespace Basement
 {
-    [BepInPlugin("com.rolopogo.Basement", "Basement", "1.0.1")]
+    [BepInPlugin("com.rolopogo.Basement", "Basement", "1.0.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource Log { get; private set; }
         public static Plugin instance;
         public static GameObject basementPrefab { get; private set; }
-
-        public ConfigEntry<bool> enabledConfig;
+        public static ConfigEntry<int> NestedBasementLimit { get; private set; }
+        public static ConfigEntry<bool> EnabledConfig { get; private set; }
 
         private void Awake()
         {
             instance = this;
             Log = Logger;
-            enabledConfig = Config.Bind("General", "Enabled", true, "Enables Basement");
+            EnabledConfig = Config.Bind("General", "Enabled", true, "Enables Basement");
+            NestedBasementLimit= Config.Bind("General", "NestingLimit", 3, "Limit for how many nested levels of basements you can have (0 = no nesting)");
 
-            if (enabledConfig.Value)
+            if (EnabledConfig.Value)
             {
                 
                 ObjectDBHelper.OnAfterInit += AddPieceToTool;
@@ -39,13 +40,23 @@ namespace Basement
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.rolopogo.Basement");
 
             MaterialReplacer.GetAllMaterials();
+
+            GameObject prefabRoot = new GameObject("BasementPrefabRoot");
+            prefabRoot.SetActive(false);
             // Load from assetbundle
             var bundle = AssetBundle.LoadFromMemory(ResourceUtils.GetResource(Assembly.GetExecutingAssembly(), "Basement.Resources.basement"));
-            basementPrefab = bundle.LoadAsset<GameObject>("Basement");
+            var basementAsset = bundle.LoadAsset<GameObject>("Basement");
+            basementPrefab = Instantiate(basementAsset, prefabRoot.transform);
             basementPrefab.AddComponent<Basement>();
             bundle.Unload(false);
 
-            Plugin.basementPrefab.name = "basement.basementprefab";
+            // Force enable objects in prefab?
+            foreach(Transform t in basementPrefab.GetComponentsInChildren<Transform>())
+            {
+                t.gameObject.SetActive(true);
+            }
+
+            basementPrefab.name = "basement.basementprefab";
 
             // update material references
             MaterialReplacer.ReplaceAllMaterialsWithOriginal(basementPrefab);
@@ -68,6 +79,7 @@ namespace Basement
             piece.m_clipEverything = true;
             // Add spawn effect
             piece.m_placeEffect = Prefab.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
+            piece.m_repairPiece = false;
 
             piece.FixReferences();
 
@@ -77,8 +89,7 @@ namespace Basement
             var hammerPrefab = Prefab.Cache.GetPrefab<GameObject>("Hammer");
             var hammerPieceTable = hammerPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
 
-            hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);
-           
+            hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);           
         }
     }
 }
