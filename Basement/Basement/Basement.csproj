@@ -47,6 +47,9 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\..\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Modded\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="JotunnLib0.1.6">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\JotunnLib0.1.6.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -87,12 +90,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Valheim\unstripped_corlib\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
-    <Reference Include="ValheimLib">
-      <HintPath>..\..\..\..\..\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Dev\BepInEx\plugins\ValheimModding-ValheimLib\ValheimLib\ValheimLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basement.cs" />
+    <Compile Include="ObjectDBscan.cs" />
     <Compile Include="Patches\Character_Patches.cs" />
     <Compile Include="Patches\EnvMan_Patches.cs" />
     <Compile Include="MaterialReplacer.cs" />

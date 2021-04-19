@@ -24,6 +24,10 @@ namespace Basement
         public static void ReplaceAllMaterialsWithOriginal(GameObject go)
         {
             if (originalMaterials == null) GetAllMaterials();
+             if (originalMaterials == null)
+            {
+                Debug.LogError("Failed To load stock materials");
+            }
 
             foreach (Renderer renderer in go.GetComponentsInChildren<Renderer>(true))
             {
