@@ -41,12 +41,22 @@ namespace Basement
 
             MaterialReplacer.GetAllMaterials();
 
+            GameObject prefabRoot = new GameObject("BasementPrefabRoot");
+            DontDestroyOnLoad(prefabRoot);
+            prefabRoot.SetActive(false);
             // Load from assetbundle
             var bundle = AssetBundle.LoadFromMemory(ResourceUtils.GetResource(Assembly.GetExecutingAssembly(), "Basement.Resources.basement"));
             var basementAsset = bundle.LoadAsset<GameObject>("Basement");
-            GameObject basementPrefab = basementAsset.InstantiateClone("basement.basementprefab");
-
+            basementPrefab = Instantiate(basementAsset, prefabRoot.transform);
             basementPrefab.AddComponent<Basement>();
+            bundle.Unload(false);
+
+            // Force enable objects in prefab?
+            foreach (Transform t in basementPrefab.GetComponentsInChildren<Transform>())
+            {
+                t.gameObject.SetActive(true);
+            }
+            basementPrefab.name = "basement.basementprefab";
 
             // update material references
             MaterialReplacer.ReplaceAllMaterialsWithOriginal(basementPrefab);
@@ -73,13 +83,13 @@ namespace Basement
 
             piece.FixReferences();
 
+            Prefab.NetworkRegister(basementPrefab);
+
             // Add to tool
-            GameObject hammerPrefab = Prefab.Cache.GetPrefab<GameObject>("_HammerPieceTable");
-            PieceTable hammerTable = hammerPrefab.GetComponent<PieceTable>();
+            var hammerPrefab = Prefab.Cache.GetPrefab<GameObject>("Hammer");
+            var hammerPieceTable = hammerPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
 
-            hammerTable.m_pieces.Add(basementPrefab.gameObject);
-
-            bundle.Unload(false);
+            hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);           
         }
     }
 }
