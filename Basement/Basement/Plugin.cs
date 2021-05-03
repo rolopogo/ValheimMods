@@ -52,10 +52,11 @@ namespace Basement
             bundle.Unload(false);
 
             // Force enable objects in prefab?
-            foreach (Transform t in basementPrefab.GetComponentsInChildren<Transform>())
+            foreach(Transform t in basementPrefab.GetComponentsInChildren<Transform>())
             {
                 t.gameObject.SetActive(true);
             }
+
             basementPrefab.name = "basement.basementprefab";
 
             // update material references
