@@ -42,6 +42,7 @@ namespace Basement
             MaterialReplacer.GetAllMaterials();
 
             GameObject prefabRoot = new GameObject("BasementPrefabRoot");
+            DontDestroyOnLoad(prefabRoot);
             prefabRoot.SetActive(false);
             // Load from assetbundle
             var bundle = AssetBundle.LoadFromMemory(ResourceUtils.GetResource(Assembly.GetExecutingAssembly(), "Basement.Resources.basement"));
