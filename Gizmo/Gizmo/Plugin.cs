@@ -129,7 +129,7 @@ namespace Gizmo
             {
                 HandleAxisInput(scrollWheelInput, ref zRot, zGizmo);
             }
-            else if (Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_hammer")
+            else if (buildMode)
             {
                 HandleAxisInput(scrollWheelInput, ref yRot, yGizmo);
             }
