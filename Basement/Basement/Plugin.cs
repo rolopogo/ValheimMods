@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using RoloPogo.Utils;
 using UnityEngine;
-using ValheimLib;
-using ValheimLib.ODB;
+using Jotunn;
+using Jotunn.Managers;
+using Jotunn.Entities;
+
 
 namespace Basement
 {
@@ -30,8 +30,7 @@ namespace Basement
 
             if (EnabledConfig.Value)
             {
-                
-                ObjectDBHelper.OnAfterInit += AddPieceToTool;
+                PrefabManager.OnPrefabsRegistered += AddPieceToTool;
             }
         }
         
@@ -79,15 +78,15 @@ namespace Basement
             piece.m_craftingStation = Mock<CraftingStation>.Create("piece_stonecutter");
             piece.m_clipEverything = true;
             // Add spawn effect
-            piece.m_placeEffect = Prefab.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
+            piece.m_placeEffect = PrefabManager.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
             piece.m_repairPiece = false;
 
             piece.FixReferences();
 
-            Prefab.NetworkRegister(basementPrefab);
+            PrefabManager.Instance.AddPrefab(basementPrefab);
 
             // Add to tool
-            var hammerPrefab = Prefab.Cache.GetPrefab<GameObject>("Hammer");
+            var hammerPrefab = PrefabManager.Cache.GetPrefab<GameObject>("Hammer");
             var hammerPieceTable = hammerPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
 
             hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);           
