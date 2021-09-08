@@ -60,6 +60,7 @@ namespace Basement
             basementPrefab.name = "basement.basementprefab";
 
             // update material references
+            //Todo: Change this to work off mock system instead
             MaterialReplacer.ReplaceAllMaterialsWithOriginal(basementPrefab);
 
             var CP = new CustomPiece(basementPrefab, new PieceConfig()
