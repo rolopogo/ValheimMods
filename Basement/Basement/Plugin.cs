@@ -6,6 +6,7 @@ using HarmonyLib;
 using RoloPogo.Utils;
 using UnityEngine;
 using Jotunn;
+using Jotunn.Configs;
 using Jotunn.Managers;
 using Jotunn.Entities;
 
@@ -61,21 +62,19 @@ namespace Basement
             // update material references
             MaterialReplacer.ReplaceAllMaterialsWithOriginal(basementPrefab);
 
-            var woodRequirement = MockRequirement.Create("Wood", 100, true);
-            woodRequirement.FixReferences();
-            var stoneRequirement = MockRequirement.Create("Stone", 100, true);
-            stoneRequirement.FixReferences();
-
-            var customRequirements = new Piece.Requirement[]
+            var CP = new CustomPiece(basementPrefab, new PieceConfig()
             {
-                woodRequirement,
-                stoneRequirement
-            };
-
+                AllowedInDungeons = false,
+                Category = "Basement",
+                CraftingStation = "piece_stonecutter",
+                PieceTable = "Hammer",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig {Amount = 100, Item = "Wood", Recover = true},
+                    new RequirementConfig {Amount = 100, Item = "Stone", Recover = true}
+                }
+            });
             var piece = basementPrefab.GetComponent<Piece>();
-            piece.m_resources = customRequirements;
-            piece.m_category = Piece.PieceCategory.Misc;
-            piece.m_craftingStation = Mock<CraftingStation>.Create("piece_stonecutter");
             piece.m_clipEverything = true;
             // Add spawn effect
             piece.m_placeEffect = PrefabManager.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
@@ -83,13 +82,7 @@ namespace Basement
 
             piece.FixReferences();
 
-            PrefabManager.Instance.AddPrefab(basementPrefab);
-
-            // Add to tool
-            var hammerPrefab = PrefabManager.Cache.GetPrefab<GameObject>("Hammer");
-            var hammerPieceTable = hammerPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-
-            hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);           
+            PieceManager.Instance.AddPiece(CP);
         }
     }
 }
