@@ -3,12 +3,12 @@ using BepInEx.Configuration;
 
 using HarmonyLib;
 
-using RoloPogo.Utils;
-
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+
 using UnityEngine;
 
 namespace Gizmo {
@@ -19,9 +19,12 @@ namespace Gizmo {
     public const string PluginVersion = "1.0.0";
 
     static ConfigEntry<int> _snapDivisions;
+
     static ConfigEntry<KeyboardShortcut> _xRotationKey;
     static ConfigEntry<KeyboardShortcut> _zRotationKey;
     static ConfigEntry<KeyboardShortcut> _resetRotationKey;
+
+    static ConfigEntry<bool> _showGizmoPrefab;
 
     static GameObject _gizmoPrefab = null;
     static Transform _gizmoRoot;
@@ -44,31 +47,39 @@ namespace Gizmo {
 
     public void Awake() {
       _snapDivisions =
-          Config.Bind("Gizmo", "snapDivisions", 16, "Number of snap angles per 180 degrees. Vanilla uses 8.");
+          Config.Bind(
+              "Gizmo",
+              "snapDivisions",
+              16,
+              new ConfigDescription(
+                  "Number of snap angles per 180 degrees. Vanilla uses 8.",
+                  new AcceptableValueRange<int>(2, 128)));
 
       _snapDivisions.SettingChanged += (sender, eventArgs) => _snapAngle = 180f / _snapDivisions.Value;
       _snapAngle = 180f / _snapDivisions.Value;
 
       _xRotationKey =
           Config.Bind(
-              "Gizmo",
+              "Keys",
               "xRotationKey",
               new KeyboardShortcut(KeyCode.LeftShift),
               "Hold this key to rotate on the x-axis/plane (red circle).");
 
       _zRotationKey =
           Config.Bind(
-              "Gizmo",
+              "Keys",
               "zRotationKey",
               new KeyboardShortcut(KeyCode.LeftAlt),
               "Hold this key to rotate on the z-axis/plane (blue circle).");
 
       _resetRotationKey =
           Config.Bind(
-              "Gizmo",
+              "Keys",
               "resetRotationKey",
               new KeyboardShortcut(KeyCode.V),
               "Press this key to reset the selected axis to zero rotation.");
+
+      _showGizmoPrefab = Config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
 
       _gizmoPrefab = LoadGizmoPrefab();
       _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
@@ -105,7 +116,7 @@ namespace Gizmo {
         _gizmoRoot ??= CreateGizmoRoot();
 
         if (__instance.m_placementMarkerInstance) {
-          _gizmoRoot.gameObject.SetActive(__instance.m_placementMarkerInstance.activeSelf);
+          _gizmoRoot.gameObject.SetActive(_showGizmoPrefab.Value && __instance.m_placementMarkerInstance.activeSelf);
           _gizmoRoot.position = __instance.m_placementMarkerInstance.transform.position + (Vector3.up * 0.5f);
         }
 
@@ -142,12 +153,21 @@ namespace Gizmo {
 
     static GameObject LoadGizmoPrefab() {
       AssetBundle bundle = AssetBundle.LoadFromMemory(
-        ResourceUtils.GetResource(Assembly.GetExecutingAssembly(), "Gizmo.Resources.gizmos"));
+          GetResource(Assembly.GetExecutingAssembly(), "Gizmo.Resources.gizmos"));
 
       GameObject prefab = bundle.LoadAsset<GameObject>("GizmoRoot");
       bundle.Unload(unloadAllLoadedObjects: false);
 
       return prefab;
+    }
+
+    static byte[] GetResource(Assembly assembly, string resourceName) {
+      Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+      byte[] data = new byte[stream.Length];
+      stream.Read(data, offset: 0, count: (int) stream.Length);
+
+      return data;
     }
 
     static Transform CreateGizmoRoot() {
