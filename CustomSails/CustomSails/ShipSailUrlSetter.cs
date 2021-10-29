@@ -47,7 +47,7 @@ namespace CustomSails
             return "Sail Url";
         }
         
-        public bool Interact(Humanoid character, bool hold)
+        public bool Interact(Humanoid character, bool hold, bool alt)
         {
             if (!Plugin.instance.AllowInput()) return false;
             if (hold)
