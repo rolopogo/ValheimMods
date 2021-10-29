@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using RoloPogo.Utils;
 using UnityEngine;
-using ValheimLib;
-using ValheimLib.ODB;
+using Jotunn;
+using Jotunn.Configs;
+using Jotunn.Managers;
+using Jotunn.Entities;
+
 
 namespace Basement
 {
@@ -30,8 +31,7 @@ namespace Basement
 
             if (EnabledConfig.Value)
             {
-                
-                ObjectDBHelper.OnAfterInit += AddPieceToTool;
+                PrefabManager.OnPrefabsRegistered += AddPieceToTool;
             }
         }
         
@@ -60,37 +60,30 @@ namespace Basement
             basementPrefab.name = "basement.basementprefab";
 
             // update material references
+            //Todo: Change this to work off mock system instead
             MaterialReplacer.ReplaceAllMaterialsWithOriginal(basementPrefab);
 
-            var woodRequirement = MockRequirement.Create("Wood", 100, true);
-            woodRequirement.FixReferences();
-            var stoneRequirement = MockRequirement.Create("Stone", 100, true);
-            stoneRequirement.FixReferences();
-
-            var customRequirements = new Piece.Requirement[]
+            var CP = new CustomPiece(basementPrefab, new PieceConfig()
             {
-                woodRequirement,
-                stoneRequirement
-            };
-
+                AllowedInDungeons = false,
+                Category = "Basement",
+                CraftingStation = "piece_stonecutter",
+                PieceTable = "Hammer",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig {Amount = 100, Item = "Wood", Recover = true},
+                    new RequirementConfig {Amount = 100, Item = "Stone", Recover = true}
+                }
+            });
             var piece = basementPrefab.GetComponent<Piece>();
-            piece.m_resources = customRequirements;
-            piece.m_category = Piece.PieceCategory.Misc;
-            piece.m_craftingStation = Mock<CraftingStation>.Create("piece_stonecutter");
             piece.m_clipEverything = true;
             // Add spawn effect
-            piece.m_placeEffect = Prefab.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
+            piece.m_placeEffect = PrefabManager.Cache.GetPrefab<GameObject>("piece_stonecutter").GetComponent<Piece>().m_placeEffect;
             piece.m_repairPiece = false;
 
             piece.FixReferences();
 
-            Prefab.NetworkRegister(basementPrefab);
-
-            // Add to tool
-            var hammerPrefab = Prefab.Cache.GetPrefab<GameObject>("Hammer");
-            var hammerPieceTable = hammerPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-
-            hammerPieceTable.m_pieces.Add(basementPrefab.gameObject);           
+            PieceManager.Instance.AddPiece(CP);
         }
     }
 }
