@@ -16,7 +16,7 @@ namespace Gizmo {
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.2.0";
 
     static ConfigEntry<int> _snapDivisions;
 
@@ -89,6 +89,16 @@ namespace Gizmo {
       _harmony?.UnpatchSelf();
     }
 
+    [HarmonyPatch(typeof(Game))]
+    class GamePatch {
+      [HarmonyPostfix]
+      [HarmonyPatch(nameof(Game.Start))]
+      static void StartPostfix() {
+        Destroy(_gizmoRoot);
+        _gizmoRoot = CreateGizmoRoot();
+      }
+    }
+
     [HarmonyPatch(typeof(Player))]
     class PlayerPatch {
       [HarmonyTranspiler]
@@ -113,8 +123,6 @@ namespace Gizmo {
       [HarmonyPostfix]
       [HarmonyPatch(nameof(Player.UpdatePlacement))]
       static void UpdatePlacementPostfix(ref Player __instance, ref bool takeInput) {
-        _gizmoRoot ??= CreateGizmoRoot();
-
         if (__instance.m_placementMarkerInstance) {
           _gizmoRoot.gameObject.SetActive(_showGizmoPrefab.Value && __instance.m_placementMarkerInstance.activeSelf);
           _gizmoRoot.position = __instance.m_placementMarkerInstance.transform.position + (Vector3.up * 0.5f);
