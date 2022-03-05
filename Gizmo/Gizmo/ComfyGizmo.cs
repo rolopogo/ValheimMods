@@ -16,13 +16,14 @@ namespace Gizmo {
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.2.0";
+    public const string PluginVersion = "1.3.0";
 
     static ConfigEntry<int> _snapDivisions;
 
     static ConfigEntry<KeyboardShortcut> _xRotationKey;
     static ConfigEntry<KeyboardShortcut> _zRotationKey;
     static ConfigEntry<KeyboardShortcut> _resetRotationKey;
+    static ConfigEntry<KeyboardShortcut> _resetAllRotationKey;
 
     static ConfigEntry<bool> _showGizmoPrefab;
 
@@ -79,6 +80,13 @@ namespace Gizmo {
               new KeyboardShortcut(KeyCode.V),
               "Press this key to reset the selected axis to zero rotation.");
 
+      _resetAllRotationKey =
+          Config.Bind(
+              "Keys",
+              "resetAllRotationKey",
+              KeyboardShortcut.Empty,
+              "Press this key to reset _all axis_ rotations to zero rotation.");
+
       _showGizmoPrefab = Config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
 
       _gizmoPrefab = LoadGizmoPrefab();
@@ -113,10 +121,8 @@ namespace Gizmo {
                         typeof(Quaternion),
                         nameof(Quaternion.Euler),
                         new Type[] { typeof(float), typeof(float), typeof(float) })))
-            .SetAndAdvance(
-                OpCodes.Call,
-                Transpilers.EmitDelegate<Func<float, float, float, Quaternion>>(
-                    (x, y, z) => _xGizmoRoot.rotation).operand)
+            .SetInstructionAndAdvance(
+                Transpilers.EmitDelegate<Func<float, float, float, Quaternion>>((_, _, _) => _xGizmoRoot.rotation))
             .InstructionEnumeration();
       }
 
@@ -136,7 +142,11 @@ namespace Gizmo {
         _yGizmo.localScale = Vector3.one;
         _zGizmo.localScale = Vector3.one;
 
-        if (Input.GetKey(_xRotationKey.Value.MainKey)) {
+        if (Input.GetKey(_resetAllRotationKey.Value.MainKey)) {
+          _xRot = 0;
+          _yRot = 0;
+          _zRot = 0;
+        } else if (Input.GetKey(_xRotationKey.Value.MainKey)) {
           HandleAxisInput(ref _xRot, _xGizmo);
         } else if (Input.GetKey(_zRotationKey.Value.MainKey)) {
           HandleAxisInput(ref _zRot, _zGizmo);

@@ -1,8 +1,12 @@
-# ComfyGizmo v1.2.0
+# ComfyGizmo v1.3.0
 
 Comfy-specific version of Gizmo.
 
-  * Configurable modifier hot-keys.
+  * Configurable modifier hot-keys for:
+    * X-axis rotation (default: hold `LeftShift`)
+    * Z-axis rotation (default: hold `LeftAlt`)
+    * Reset selected axis rotation (default: `V`)
+    * Reset **ALL** axis rotations (disabled by default)
   * Can disable the Gizmo placement visual.
   * Can set the snap angles per 180 degrees from 2 - 128.
   * Original Euler-style rotation.
@@ -16,10 +20,15 @@ Comfy-specific version of Gizmo.
 ### Thunderstore
 
   1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo
-  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.1.0.zip`
-  3. Click OK on the pop-up for information
+  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.3.0.zip`
+  3. Click "OK/Import local mod" on the pop-up for information
   
 ## Changelog
+
+### 1.3.0
+
+  * Added configuration option for a 'reset all rotations' hot-key (default to un-set).
+  * Cleaned-up the UpdatePlacementGhost transpiler.
 
 ### 1.2.0
 
