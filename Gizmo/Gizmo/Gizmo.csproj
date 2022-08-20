@@ -12,9 +12,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <LangVersion>9</LangVersion>
-    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,6 +48,9 @@
       </PropertyGroup>
     </When>
   </Choose>
+  <PropertyGroup>
+    <PluginOutputPath Condition=" '$(PluginOutputPath)' == ''">$(GamePath)\BepInEx\plugins</PluginOutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
@@ -102,9 +103,35 @@
   <ItemGroup>
     <None Include="manifest.json" />
     <None Include="README.md" />
+    <None Include="icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="Copy" AfterTargets="Build">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(GamePath)\BepInEx\plugins\$(AssemblyName).dll&quot;" />
+  <Target Name="CopyAssembly" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(PluginOutputPath)" />
+  </Target>
+  <Target Name="GetAssemblyVersion" AfterTargets="Build">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <AssemblyVersions Include="@(Targets->'%(Version)')" />
+    </ItemGroup>
+    <PropertyGroup>
+      <AssemblyVersion>%(AssemblyVersions.Identity)</AssemblyVersion>
+      <Major>$(AssemblyVersion.Split('.')[0])</Major>
+      <Minor>$(AssemblyVersion.Split('.')[1])</Minor>
+      <Patch>$(AssemblyVersion.Split('.')[2])</Patch>
+      <PackageName>$(AssemblyName)_v$(Major).$(Minor).$(Patch)</PackageName>
+      <PackageDir>$(OutDir)$(PackageName)</PackageDir>
+    </PropertyGroup>
+  </Target>
+  <Target Name="MakeThunderstorePackage" AfterTargets="GetAssemblyVersion">
+    <ItemGroup>
+      <PackageFiles Include="$(TargetDir)$(AssemblyName).dll; README.md; manifest.json; icon.png" />
+    </ItemGroup>
+    <MakeDir Directories="$(PackageDir)" />
+    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(PackageDir)" />
+    <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(OutDir)$(PackageName).zip" Overwrite="true" />
+    <RemoveDir Directories="$(PackageDir)" />
   </Target>
 </Project>

@@ -20,10 +20,14 @@ Comfy-specific version of Gizmo.
 ### Thunderstore
 
   1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo
-  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.3.0.zip`
+  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.3.1.zip`
   3. Click "OK/Import local mod" on the pop-up for information
   
 ## Changelog
+
+### 1.3.1
+
+  * Try to add compatability with other mods that also transpile `UpdatePlacementGhost`.
 
 ### 1.3.0
 

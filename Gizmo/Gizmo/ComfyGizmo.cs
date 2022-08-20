@@ -16,7 +16,7 @@ namespace Gizmo {
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.3.0";
+    public const string PluginVersion = "1.3.1";
 
     static ConfigEntry<int> _snapDivisions;
 
@@ -115,14 +115,14 @@ namespace Gizmo {
         return new CodeMatcher(instructions)
             .MatchForward(
                 useEnd: false,
-                new CodeMatch(
-                    OpCodes.Call,
-                    AccessTools.Method(
-                        typeof(Quaternion),
-                        nameof(Quaternion.Euler),
-                        new Type[] { typeof(float), typeof(float), typeof(float) })))
-            .SetInstructionAndAdvance(
-                Transpilers.EmitDelegate<Func<float, float, float, Quaternion>>((_, _, _) => _xGizmoRoot.rotation))
+                new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Player), nameof(Player.m_placeRotation))),
+                new CodeMatch(OpCodes.Conv_R4),
+                new CodeMatch(OpCodes.Mul),
+                new CodeMatch(OpCodes.Ldc_R4),
+                new CodeMatch(OpCodes.Call),
+                new CodeMatch(OpCodes.Stloc_S))
+            .Advance(offset: 5)
+            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _xGizmoRoot.rotation))
             .InstructionEnumeration();
       }
 
