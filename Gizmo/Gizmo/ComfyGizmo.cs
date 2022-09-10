@@ -1,31 +1,24 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-
-using HarmonyLib;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 
+using BepInEx;
+using BepInEx.Configuration;
+
+using HarmonyLib;
+
 using UnityEngine;
+
+using static Gizmo.PluginConfig;
 
 namespace Gizmo {
   [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.3.1";
-
-    static ConfigEntry<int> _snapDivisions;
-
-    static ConfigEntry<KeyboardShortcut> _xRotationKey;
-    static ConfigEntry<KeyboardShortcut> _zRotationKey;
-    static ConfigEntry<KeyboardShortcut> _resetRotationKey;
-    static ConfigEntry<KeyboardShortcut> _resetAllRotationKey;
-
-    static ConfigEntry<bool> _showGizmoPrefab;
+    public const string PluginVersion = "1.4.0";
 
     static GameObject _gizmoPrefab = null;
     static Transform _gizmoRoot;
@@ -38,6 +31,9 @@ namespace Gizmo {
     static Transform _yGizmoRoot;
     static Transform _zGizmoRoot;
 
+    static GameObject _comfyGizmo;
+    static Transform _comfyGizmoRoot;
+
     static int _xRot;
     static int _yRot;
     static int _zRot;
@@ -47,49 +43,13 @@ namespace Gizmo {
     Harmony _harmony;
 
     public void Awake() {
-      _snapDivisions =
-          Config.Bind(
-              "Gizmo",
-              "snapDivisions",
-              16,
-              new ConfigDescription(
-                  "Number of snap angles per 180 degrees. Vanilla uses 8.",
-                  new AcceptableValueRange<int>(2, 128)));
+      BindConfig(Config);
 
-      _snapDivisions.SettingChanged += (sender, eventArgs) => _snapAngle = 180f / _snapDivisions.Value;
-      _snapAngle = 180f / _snapDivisions.Value;
-
-      _xRotationKey =
-          Config.Bind(
-              "Keys",
-              "xRotationKey",
-              new KeyboardShortcut(KeyCode.LeftShift),
-              "Hold this key to rotate on the x-axis/plane (red circle).");
-
-      _zRotationKey =
-          Config.Bind(
-              "Keys",
-              "zRotationKey",
-              new KeyboardShortcut(KeyCode.LeftAlt),
-              "Hold this key to rotate on the z-axis/plane (blue circle).");
-
-      _resetRotationKey =
-          Config.Bind(
-              "Keys",
-              "resetRotationKey",
-              new KeyboardShortcut(KeyCode.V),
-              "Press this key to reset the selected axis to zero rotation.");
-
-      _resetAllRotationKey =
-          Config.Bind(
-              "Keys",
-              "resetAllRotationKey",
-              KeyboardShortcut.Empty,
-              "Press this key to reset _all axis_ rotations to zero rotation.");
-
-      _showGizmoPrefab = Config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
+      SnapDivisions.SettingChanged += (sender, eventArgs) => _snapAngle = 180f / SnapDivisions.Value;
+      _snapAngle = 180f / SnapDivisions.Value;
 
       _gizmoPrefab = LoadGizmoPrefab();
+
       _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
     }
 
@@ -98,17 +58,21 @@ namespace Gizmo {
     }
 
     [HarmonyPatch(typeof(Game))]
-    class GamePatch {
+    static class GamePatch {
       [HarmonyPostfix]
       [HarmonyPatch(nameof(Game.Start))]
       static void StartPostfix() {
         Destroy(_gizmoRoot);
         _gizmoRoot = CreateGizmoRoot();
+
+        Destroy(_comfyGizmo);
+        _comfyGizmo = new("ComfyGizmo");
+        _comfyGizmoRoot = _comfyGizmo.transform;
       }
     }
 
     [HarmonyPatch(typeof(Player))]
-    class PlayerPatch {
+    static class PlayerPatch {
       [HarmonyTranspiler]
       [HarmonyPatch(nameof(Player.UpdatePlacementGhost))]
       static IEnumerable<CodeInstruction> UpdatePlacementGhostTranspiler(IEnumerable<CodeInstruction> instructions) {
@@ -122,7 +86,7 @@ namespace Gizmo {
                 new CodeMatch(OpCodes.Call),
                 new CodeMatch(OpCodes.Stloc_S))
             .Advance(offset: 5)
-            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _xGizmoRoot.rotation))
+            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _comfyGizmoRoot.rotation))
             .InstructionEnumeration();
       }
 
@@ -130,7 +94,7 @@ namespace Gizmo {
       [HarmonyPatch(nameof(Player.UpdatePlacement))]
       static void UpdatePlacementPostfix(ref Player __instance, ref bool takeInput) {
         if (__instance.m_placementMarkerInstance) {
-          _gizmoRoot.gameObject.SetActive(_showGizmoPrefab.Value && __instance.m_placementMarkerInstance.activeSelf);
+          _gizmoRoot.gameObject.SetActive(ShowGizmoPrefab.Value && __instance.m_placementMarkerInstance.activeSelf);
           _gizmoRoot.position = __instance.m_placementMarkerInstance.transform.position + (Vector3.up * 0.5f);
         }
 
@@ -142,16 +106,50 @@ namespace Gizmo {
         _yGizmo.localScale = Vector3.one;
         _zGizmo.localScale = Vector3.one;
 
-        if (Input.GetKey(_resetAllRotationKey.Value.MainKey)) {
+        if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
+          _comfyGizmo.transform.localRotation = Quaternion.identity;
           _xRot = 0;
           _yRot = 0;
           _zRot = 0;
-        } else if (Input.GetKey(_xRotationKey.Value.MainKey)) {
+        } else if (Input.GetKey(XRotationKey.Value.MainKey)) {
+          _xGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _xRot, _xGizmo);
-        } else if (Input.GetKey(_zRotationKey.Value.MainKey)) {
+
+          if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
+            Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
+            _comfyGizmo.transform.localRotation = Quaternion.Euler(0f, rotation.y, rotation.z);
+          } else {
+            _comfyGizmo.transform.Rotate(
+                (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle,
+                0f,
+                0f);
+          }
+        } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
+          _zGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _zRot, _zGizmo);
+
+          if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
+            Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
+            _comfyGizmo.transform.localRotation = Quaternion.Euler(rotation.x, rotation.y, 0f);
+          } else {
+            _comfyGizmo.transform.Rotate(
+                0f,
+                0f,
+                (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle);
+          }
         } else {
+          _yGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _yRot, _yGizmo);
+
+          if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
+            Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
+            _comfyGizmo.transform.localRotation = Quaternion.Euler(rotation.x, 0f, rotation.z);
+          } else {
+            _comfyGizmo.transform.Rotate(
+                0f,
+                (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle,
+                0f);
+          }
         }
 
         _xGizmoRoot.localRotation = Quaternion.Euler(_xRot * _snapAngle, 0f, 0f);
@@ -160,11 +158,11 @@ namespace Gizmo {
       }
     }
 
-    private static void HandleAxisInput(ref int rotation, Transform gizmo) {
+    static void HandleAxisInput(ref int rotation, Transform gizmo) {
       gizmo.localScale = Vector3.one * 1.5f;
-      rotation = (rotation + Math.Sign(Input.GetAxis("Mouse ScrollWheel"))) % (_snapDivisions.Value * 2);
+      rotation = (rotation + Math.Sign(Input.GetAxis("Mouse ScrollWheel"))) % (SnapDivisions.Value * 2);
 
-      if (Input.GetKey(_resetRotationKey.Value.MainKey)) {
+      if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
         rotation = 0;
       }
     }
