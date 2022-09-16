@@ -13,11 +13,11 @@
  
 ## Installation
 
-### Manual installation:
+### Manual
 
   1. Unzip `Gizmo.dll` to your `/valheim/BepInEx/plugins/` folder
 
-### Thunderstore
+### Thunderstore (manual)
 
   1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo.
   2. **Disable or uninstall** any manually installed `ComfyGizmo_v1.3.0` or earlier.
