@@ -21,7 +21,7 @@ namespace Gizmo {
               16,
               new ConfigDescription(
                   "Number of snap angles per 180 degrees. Vanilla uses 8.",
-                  new AcceptableValueRange<int>(2, 128)));
+                 new AcceptableValueRange<int>(2, 256)));
 
       XRotationKey =
           config.Bind(

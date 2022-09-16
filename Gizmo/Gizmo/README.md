@@ -1,6 +1,6 @@
-# ComfyGizmo v1.3.0
+# ComfyGizmo v1.4.0
 
-Comfy-specific version of Gizmo.
+*Comfy-specific version of Gizmo.*
 
   * Configurable modifier hot-keys for:
     * X-axis rotation (default: hold `LeftShift`)
@@ -19,11 +19,18 @@ Comfy-specific version of Gizmo.
 
 ### Thunderstore
 
-  1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo
-  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.3.1.zip`
-  3. Click "OK/Import local mod" on the pop-up for information
+  1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo.
+  2. Go to Settings > Import local mod > select `ComfyGizmo_v1.4.0.zip`.
+  3. Click "OK/Import local mod" on the pop-up for information.
   
 ## Changelog
+
+### 1.4.0 (WIP)
+
+  * Create a new GameObject `ComfyGizmo` to maintain the current Quaternion rotation state.
+  * Re-ordered the mapping/assignment of original Gizmo's prefab XYZ roots/transforms per request by Jere.
+  * Increased the snap-angles maximum from 128 to 256.
+  * Moved plugin configuration logic into its own class `PluginConfig`.
 
 ### 1.3.1
 
