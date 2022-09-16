@@ -8,7 +8,7 @@
     * Reset selected axis rotation (default: `V`)
     * Reset **ALL** axis rotations (disabled by default)
   * Can disable the Gizmo placement visual.
-  * Can set the snap angles per 180 degrees from 2 - 128.
+  * Can set the snap angles per 180 degrees from 2 - 256.
   * Original Euler-style rotation.
  
 ## Installation
@@ -25,7 +25,7 @@
   
 ## Changelog
 
-### 1.4.0 (WIP)
+### 1.4.0
 
   * Create a new GameObject `ComfyGizmo` to maintain the current Quaternion rotation state.
   * Re-ordered the mapping/assignment of original Gizmo's prefab XYZ roots/transforms per request by Jere.

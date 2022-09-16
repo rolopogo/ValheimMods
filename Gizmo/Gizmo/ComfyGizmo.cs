@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 
 using BepInEx;
-using BepInEx.Configuration;
 
 using HarmonyLib;
 
@@ -107,50 +106,18 @@ namespace Gizmo {
         _zGizmo.localScale = Vector3.one;
 
         if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
-          //_comfyGizmo.transform.localRotation = Quaternion.identity;
-
           _xRot = 0;
           _yRot = 0;
           _zRot = 0;
         } else if (Input.GetKey(XRotationKey.Value.MainKey)) {
           _xGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _xRot, _xGizmo);
-
-          //if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
-          //  Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
-          //  _comfyGizmo.transform.localRotation = Quaternion.Euler(0f, rotation.y, rotation.z);
-          //} else {
-          //  _comfyGizmo.transform.Rotate(
-          //      (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle,
-          //      0f,
-          //      0f);
-          //}
         } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
           _zGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _zRot, _zGizmo);
-
-          //if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
-          //  Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
-          //  _comfyGizmo.transform.localRotation = Quaternion.Euler(rotation.x, rotation.y, 0f);
-          //} else {
-          //  _comfyGizmo.transform.Rotate(
-          //      0f,
-          //      0f,
-          //      (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle);
-          //}
         } else {
           _yGizmo.localScale = Vector3.one * 1.5f;
           HandleAxisInput(ref _yRot, _yGizmo);
-
-          //if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
-          //  Vector3 rotation = _comfyGizmo.transform.localRotation.eulerAngles;
-          //  _comfyGizmo.transform.localRotation = Quaternion.Euler(rotation.x, 0f, rotation.z);
-          //} else {
-          //  _comfyGizmo.transform.Rotate(
-          //      0f,
-          //      (Math.Sign(Input.GetAxis("Mouse ScrollWheel")) % (SnapDivisions.Value * 2)) * _snapAngle,
-          //      0f);
-          //}
         }
 
         _comfyGizmo.transform.localRotation =
