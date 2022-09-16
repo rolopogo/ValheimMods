@@ -1,7 +1,7 @@
 {
   "name": "Gizmo",
-  "version_number": "1.3.1",
-  "author": "redseiko",
+  "version_number": "1.4.0",
+  "author": "ComfyMods",
   "website_url": "https://github.com/redseiko/ValheimMods/tree/main/Gizmo/Gizmo",
   "description": "Comfy-specific fork of Gizmo.",
   "dependencies": [ 
