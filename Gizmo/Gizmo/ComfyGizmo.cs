@@ -247,13 +247,13 @@ namespace Gizmo {
       _gizmoRoot = Instantiate(_gizmoPrefab).transform;
 
       // ??? Something about quaternions.
-      _zGizmo = _gizmoRoot.Find("YRoot/ZRoot/XRoot/X");
+      _xGizmo = _gizmoRoot.Find("YRoot/ZRoot/XRoot/X");
       _yGizmo = _gizmoRoot.Find("YRoot/Y");
-      _xGizmo = _gizmoRoot.Find("YRoot/ZRoot/Z");
+      _zGizmo = _gizmoRoot.Find("YRoot/ZRoot/Z");
 
-      _zGizmoRoot = _gizmoRoot.Find("YRoot/ZRoot/XRoot");
+      _xGizmoRoot = _gizmoRoot.Find("YRoot/ZRoot/XRoot");
       _yGizmoRoot = _gizmoRoot.Find("YRoot");
-      _xGizmoRoot = _gizmoRoot.Find("YRoot/ZRoot");
+      _zGizmoRoot = _gizmoRoot.Find("YRoot/ZRoot");
 
       return _gizmoRoot.transform;
     }
