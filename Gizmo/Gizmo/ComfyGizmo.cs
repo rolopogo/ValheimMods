@@ -17,7 +17,7 @@ namespace Gizmo {
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.4.0";
+    public const string PluginVersion = "1.4.1";
 
     static GameObject _gizmoPrefab = null;
     static Transform _gizmoRoot;
@@ -37,6 +37,8 @@ namespace Gizmo {
     static int _yRot;
     static int _zRot;
 
+    static bool _localFrame;
+
     static float _snapAngle;
 
     Harmony _harmony;
@@ -48,7 +50,7 @@ namespace Gizmo {
       _snapAngle = 180f / SnapDivisions.Value;
 
       _gizmoPrefab = LoadGizmoPrefab();
-
+     
       _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginGUID);
     }
 
@@ -67,6 +69,7 @@ namespace Gizmo {
         Destroy(_comfyGizmo);
         _comfyGizmo = new("ComfyGizmo");
         _comfyGizmoRoot = _comfyGizmo.transform;
+        _localFrame = UseLocalFrame.Value;
       }
     }
 
@@ -101,32 +104,104 @@ namespace Gizmo {
           return;
         }
 
+        if (Input.GetKey(ChangeRotationModeKey.Value.MainKey)) {
+          UseLocalFrame.Value = !UseLocalFrame.Value;
+        }
+
+        // Reset rotations on changing from default rotations to local frame rotations and vice versa
+        if (_localFrame != UseLocalFrame.Value) {
+          if(_localFrame) {
+            ResetRotationsLocalFrame();
+          } else {
+            ResetRotations();
+          }
+          
+          _localFrame = UseLocalFrame.Value;
+          return;
+        }
+
         _xGizmo.localScale = Vector3.one;
         _yGizmo.localScale = Vector3.one;
         _zGizmo.localScale = Vector3.one;
 
-        if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
-          _xRot = 0;
-          _yRot = 0;
-          _zRot = 0;
-        } else if (Input.GetKey(XRotationKey.Value.MainKey)) {
-          _xGizmo.localScale = Vector3.one * 1.5f;
-          HandleAxisInput(ref _xRot, _xGizmo);
-        } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
-          _zGizmo.localScale = Vector3.one * 1.5f;
-          HandleAxisInput(ref _zRot, _zGizmo);
+        if (!UseLocalFrame.Value) {
+          Rotate();
         } else {
-          _yGizmo.localScale = Vector3.one * 1.5f;
-          HandleAxisInput(ref _yRot, _yGizmo);
+          RotateLocalFrame();
         }
-
-        _comfyGizmo.transform.localRotation =
-            Quaternion.Euler(_xRot * _snapAngle, _yRot * _snapAngle, _zRot * _snapAngle);
-
-        _xGizmoRoot.localRotation = Quaternion.Euler(_xRot * _snapAngle, 0f, 0f);
-        _yGizmoRoot.localRotation = Quaternion.Euler(0f, _yRot * _snapAngle, 0f);
-        _zGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, _zRot * _snapAngle);
       }
+    }
+
+    static void ResetRotations() {
+      _xRot = 0;
+      _yRot = 0;
+      _zRot = 0;
+
+      _comfyGizmo.transform.localRotation =
+        Quaternion.Euler(_xRot * _snapAngle, _yRot * _snapAngle, _zRot * _snapAngle);
+
+      _xGizmoRoot.localRotation = Quaternion.Euler(_xRot * _snapAngle, 0f, 0f);
+      _yGizmoRoot.localRotation = Quaternion.Euler(0f, _yRot * _snapAngle, 0f);
+      _zGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, _zRot * _snapAngle);
+    }
+
+    static void ResetRotationsLocalFrame() {
+      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.up);
+      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.right);
+      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.forward);
+
+      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.up);
+      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.right);
+      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.forward);
+    }
+
+    static void Rotate() {
+      if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
+        ResetRotations();
+      } else if (Input.GetKey(XRotationKey.Value.MainKey)) {
+        _xGizmo.localScale = Vector3.one * 1.5f;
+        HandleAxisInput(ref _xRot, _xGizmo);
+      } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
+        _zGizmo.localScale = Vector3.one * 1.5f;
+        HandleAxisInput(ref _zRot, _zGizmo);
+      } else {
+        _yGizmo.localScale = Vector3.one * 1.5f;
+        HandleAxisInput(ref _yRot, _yGizmo);
+      }
+
+      _comfyGizmo.transform.localRotation =
+          Quaternion.Euler(_xRot * _snapAngle, _yRot * _snapAngle, _zRot * _snapAngle);
+
+      _xGizmoRoot.localRotation = Quaternion.Euler(_xRot * _snapAngle, 0f, 0f);
+      _yGizmoRoot.localRotation = Quaternion.Euler(0f, _yRot * _snapAngle, 0f);
+      _zGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, _zRot * _snapAngle);
+    }
+
+    static void RotateLocalFrame() {
+      if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
+        ResetRotationsLocalFrame();
+        return;
+      }
+
+      float rotation = Math.Sign(Input.GetAxis("Mouse ScrollWheel")) * _snapAngle;
+      Vector3 rotVector;
+
+      if (Input.GetKey(XRotationKey.Value.MainKey)) {
+        _xGizmo.localScale = Vector3.one * 1.5f;
+        rotVector = Vector3.right;
+        HandleAxisInputLocalFrame(rotVector, _xGizmo);
+      } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
+        _zGizmo.localScale = Vector3.one * 1.5f;
+        rotVector = Vector3.forward;
+        HandleAxisInputLocalFrame(rotVector, _zGizmo);
+      } else {
+        _yGizmo.localScale = Vector3.one * 1.5f;
+        rotVector = Vector3.up;
+        HandleAxisInputLocalFrame(rotVector, _yGizmo);
+      }
+
+      _comfyGizmo.transform.rotation *= Quaternion.AngleAxis(rotation, rotVector);
+      _gizmoRoot.rotation *= Quaternion.AngleAxis(rotation, rotVector);
     }
 
     static void HandleAxisInput(ref int rotation, Transform gizmo) {
@@ -135,6 +210,17 @@ namespace Gizmo {
 
       if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
         rotation = 0;
+      }
+    }
+
+    static void HandleAxisInputLocalFrame(Vector3 rotVector, Transform gizmo) {
+      gizmo.localScale = Vector3.one * 1.5f;
+
+      if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
+        _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, rotVector);
+        _xGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
+        _yGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
+        _zGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
       }
     }
 
