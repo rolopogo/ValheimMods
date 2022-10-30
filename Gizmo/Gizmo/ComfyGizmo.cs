@@ -34,6 +34,7 @@ namespace Gizmo {
     static Transform _comfyGizmoRoot;
 
     static Vector3 _eulerAngles;
+    static float _rotation;
 
     static bool _localFrame;
 
@@ -170,8 +171,7 @@ namespace Gizmo {
         if (!_localFrame) {
           Rotate();
         } else {
-          int direction = Math.Sign(Input.GetAxis("Mouse ScrollWheel"));
-          RotateLocalFrame(direction);
+          RotateLocalFrame();
         }
       }
     }
@@ -194,30 +194,30 @@ namespace Gizmo {
       RotateGizmoComponents(_eulerAngles);
     }
 
-    static void RotateLocalFrame(int direction) {
+    static void RotateLocalFrame() {
       if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
         ResetRotationsLocalFrame();
         return;
       }
 
-      float rotation = direction * _snapAngle;
+      _rotation = 0f;
       Vector3 rotVector;
 
       if (Input.GetKey(XRotationKey.Value.MainKey)) {
         _xGizmo.localScale = Vector3.one * 1.5f;
         rotVector = Vector3.right;
-        HandleAxisInputLocalFrame(rotVector, _xGizmo);
+        HandleAxisInputLocalFrame(ref _rotation, rotVector, _xGizmo);
       } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
         _zGizmo.localScale = Vector3.one * 1.5f;
         rotVector = Vector3.forward;
-        HandleAxisInputLocalFrame(rotVector, _zGizmo);
+        HandleAxisInputLocalFrame(ref _rotation, rotVector, _zGizmo);
       } else {
         _yGizmo.localScale = Vector3.one * 1.5f;
         rotVector = Vector3.up;
-        HandleAxisInputLocalFrame(rotVector, _yGizmo);
+        HandleAxisInputLocalFrame(ref _rotation, rotVector, _yGizmo);
       }
 
-      RotateAxes(rotation, rotVector);
+      RotateAxes(_rotation, rotVector);
     }
 
     static void RotateAxes(float rotation, Vector3 rotVector) {
@@ -234,14 +234,13 @@ namespace Gizmo {
       return rotation;
     }
 
-    static void HandleAxisInputLocalFrame(Vector3 rotVector, Transform gizmo) {
+    static void HandleAxisInputLocalFrame(ref float rotation, Vector3 rotVector, Transform gizmo) {
       gizmo.localScale = Vector3.one * 1.5f;
+      rotation = Math.Sign(Input.GetAxis("Mouse ScrollWheel")) * _snapAngle;
 
       if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
-        _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, rotVector);
-        _xGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
-        _yGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
-        _zGizmoRoot.rotation = Quaternion.AngleAxis(0f, rotVector);
+        rotation = 0f;
+        ResetRotationLocalFrameAxis(rotVector);
       }
     }
     static void MatchPieceRotation(Piece target) {
@@ -277,13 +276,14 @@ namespace Gizmo {
     }
 
     static void ResetRotationsLocalFrame() {
-      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.up);
-      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.right);
-      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, Vector3.forward);
+      ResetRotationLocalFrameAxis(Vector3.up);
+      ResetRotationLocalFrameAxis(Vector3.right);
+      ResetRotationLocalFrameAxis(Vector3.forward);
+    }
 
-      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.up);
-      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.right);
-      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, Vector3.forward);
+    static void ResetRotationLocalFrameAxis(Vector3 axis) {
+      _comfyGizmo.transform.rotation = Quaternion.AngleAxis(0f, axis);
+      _gizmoRoot.rotation = Quaternion.AngleAxis(0f, axis);
     }
 
     static GameObject LoadGizmoPrefab() {

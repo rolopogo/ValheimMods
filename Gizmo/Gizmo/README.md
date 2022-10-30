@@ -27,9 +27,13 @@
 ## Changelog
 
 ### 1.5.0
+  * Added hotkeys for halving and doubling snap divisions. PageUp and PageDown by default.
+  * Added toggle for resetting piece rotation on snap division change. Enabled by default.
+  * Added feature to copy target piece's rotation.
   * Added alternate rotation method for using local frame coordinates.
   * Added configuration option to rotate using local frame coordinates.
   * Hot key added to toggle between default and local frame rotation modes. Default set to back quote.
+  * Added toggle to reset piece orientation which changing between rotation frames. Enabled by default.
   
 ### 1.4.0
 
