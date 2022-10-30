@@ -12,9 +12,14 @@ namespace Gizmo {
     public static ConfigEntry<KeyboardShortcut> ResetAllRotationKey;
     public static ConfigEntry<KeyboardShortcut> ChangeRotationModeKey;
     public static ConfigEntry<KeyboardShortcut> CopyPieceRotationKey;
+    public static ConfigEntry<KeyboardShortcut> SnapDivisionIncrementKey;
+    public static ConfigEntry<KeyboardShortcut> SnapDivisionDecrementKey;
 
     public static ConfigEntry<bool> ShowGizmoPrefab;
     public static ConfigEntry<bool> ResetRotation;
+
+    public static int MaxSnapDivisions = 256;
+    public static int MinSnapDivisions = 2;
 
     public static void BindConfig(ConfigFile config) {
       SnapDivisions =
@@ -24,7 +29,7 @@ namespace Gizmo {
               16,
               new ConfigDescription(
                   "Number of snap angles per 180 degrees. Vanilla uses 8.",
-                 new AcceptableValueRange<int>(2, 256)));
+                 new AcceptableValueRange<int>(MinSnapDivisions, MaxSnapDivisions)));
 
       XRotationKey =
           config.Bind(
@@ -68,6 +73,20 @@ namespace Gizmo {
               "copyPieceRotation",
               KeyboardShortcut.Empty,
               "Press this key to copy targeted piece's rotation.");
+
+      SnapDivisionIncrementKey =
+          config.Bind(
+              "Keys",
+              "snapDivisionIncrement",
+              new KeyboardShortcut(KeyCode.PageUp),
+              "Doubles snap divisions from current.");
+
+      SnapDivisionDecrementKey =
+          config.Bind(
+              "Keys",
+              "snapDivisionDecrement",
+              new KeyboardShortcut(KeyCode.PageDown),
+              "Doubles snap divisions from current.");
 
       ShowGizmoPrefab = config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
       ResetRotation = config.Bind("RotationFrame", "resetOnModeChange", true, "Resets the piece's rotation on mode switch.");

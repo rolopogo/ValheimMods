@@ -102,6 +102,20 @@ namespace Gizmo {
           return;
         }
 
+        if(Input.GetKeyDown(SnapDivisionIncrementKey.Value.MainKey)) {
+          if(SnapDivisions.Value * 2 <= MaxSnapDivisions) {
+            MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"Snap divisions increased to {SnapDivisions.Value * 2}");
+            SnapDivisions.Value = SnapDivisions.Value * 2;
+          }
+        }
+
+        if (Input.GetKeyDown(SnapDivisionDecrementKey.Value.MainKey)) {
+          if(Math.Floor(SnapDivisions.Value/2f) == SnapDivisions.Value/2f && SnapDivisions.Value/2 >= MinSnapDivisions) {
+            MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"Snap divisions decreased to {SnapDivisions.Value / 2}");
+            SnapDivisions.Value = SnapDivisions.Value / 2;
+          }
+        }
+
         if (Input.GetKey(CopyPieceRotationKey.Value.MainKey) && __instance.m_hoveringPiece != null) {
           MatchPieceRotation(__instance.m_hoveringPiece);
         }
