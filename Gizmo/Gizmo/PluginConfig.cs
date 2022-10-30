@@ -17,6 +17,7 @@ namespace Gizmo {
 
     public static ConfigEntry<bool> ShowGizmoPrefab;
     public static ConfigEntry<bool> ResetRotation;
+    public static ConfigEntry<bool> ResetRotationOnSnapDivisionChange;
 
     public static int MaxSnapDivisions = 256;
     public static int MinSnapDivisions = 2;
@@ -88,6 +89,7 @@ namespace Gizmo {
               new KeyboardShortcut(KeyCode.PageDown),
               "Doubles snap divisions from current.");
 
+      ResetRotationOnSnapDivisionChange = config.Bind("Snap Division Change", "resetOnSnapDivisionChange", true, "Resets the piece's rotation on snap division change.");
       ShowGizmoPrefab = config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
       ResetRotation = config.Bind("RotationFrame", "resetOnModeChange", true, "Resets the piece's rotation on mode switch.");
     }

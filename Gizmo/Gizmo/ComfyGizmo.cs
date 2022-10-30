@@ -106,6 +106,14 @@ namespace Gizmo {
           if(SnapDivisions.Value * 2 <= MaxSnapDivisions) {
             MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"Snap divisions increased to {SnapDivisions.Value * 2}");
             SnapDivisions.Value = SnapDivisions.Value * 2;
+            if(ResetRotationOnSnapDivisionChange.Value) {
+              if(_localFrame) {
+                ResetRotationsLocalFrame();
+              } else {
+                ResetRotations();
+              }
+              return;
+            }
           }
         }
 
@@ -113,6 +121,14 @@ namespace Gizmo {
           if(Math.Floor(SnapDivisions.Value/2f) == SnapDivisions.Value/2f && SnapDivisions.Value/2 >= MinSnapDivisions) {
             MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"Snap divisions decreased to {SnapDivisions.Value / 2}");
             SnapDivisions.Value = SnapDivisions.Value / 2;
+            if (ResetRotationOnSnapDivisionChange.Value) {
+              if (_localFrame) {
+                ResetRotationsLocalFrame();
+              } else {
+                ResetRotations();
+              }
+              return;
+            }
           }
         }
 
@@ -238,6 +254,7 @@ namespace Gizmo {
       }
     }
     static void ResetRotations() {
+      _eulerAngles = Vector3.zero;
       _comfyGizmo.transform.localRotation = Quaternion.Euler(Vector3.zero);
       RotateGizmoComponents(Vector3.zero);
     }
