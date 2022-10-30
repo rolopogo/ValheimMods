@@ -106,10 +106,11 @@ namespace Gizmo {
           MatchPieceRotation(__instance.m_hoveringPiece);
         }
 
-        // Reset rotations on changing from default rotations to local frame rotations and vice versa
+        // Change Rotation Frames
         if (Input.GetKeyDown(ChangeRotationModeKey.Value.MainKey)) {
           if(_localFrame) {
-            if(ResetRotation.Value) {
+            MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, "Default rotation mode enabled");
+            if (ResetRotation.Value) {
               ResetRotationsLocalFrame();
             } else {
               _eulerAngles = _comfyGizmo.transform.eulerAngles;
@@ -118,7 +119,8 @@ namespace Gizmo {
             }
             
           } else {
-            if(ResetRotation.Value) {
+            MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, "Local frame rotation mode enabled");
+            if (ResetRotation.Value) {
               ResetRotations();
             } else {
               Quaternion currentRotation = _comfyGizmoRoot.rotation;
