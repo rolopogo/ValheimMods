@@ -11,6 +11,7 @@ namespace Gizmo {
     public static ConfigEntry<KeyboardShortcut> ResetRotationKey;
     public static ConfigEntry<KeyboardShortcut> ResetAllRotationKey;
     public static ConfigEntry<KeyboardShortcut> ChangeRotationModeKey;
+    public static ConfigEntry<KeyboardShortcut> CopyPieceRotationKey;
 
     public static ConfigEntry<bool> ShowGizmoPrefab;
     public static ConfigEntry<bool> UseLocalFrame;
@@ -59,7 +60,14 @@ namespace Gizmo {
               "Keys",
               "changeRotationMode",
               new KeyboardShortcut(KeyCode.BackQuote),
-              "Press this key to reset _all axis_ rotations to zero rotation.");
+              "Press this key to toggle rotation modes.");
+
+      CopyPieceRotationKey =
+          config.Bind(
+              "Keys",
+              "copyPieceRotation",
+              KeyboardShortcut.Empty,
+              "Press this key to copy targeted piece's rotation.");
 
       ShowGizmoPrefab = config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
       UseLocalFrame = config.Bind("RotationFrame", "useLocalFrame", false, "Use the local piece coordinate system for rotations.");
