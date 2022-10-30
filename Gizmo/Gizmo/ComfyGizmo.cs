@@ -245,9 +245,9 @@ namespace Gizmo {
         _gizmoRoot.rotation = targetQuaternion;
       } else {
         Vector3 eulerAngles = GetEulerAngles(target);
-        _xRot = (int)Math.Floor(eulerAngles.x/_snapAngle);
-        _yRot = (int)Math.Floor(eulerAngles.y / _snapAngle);
-        _zRot = (int)Math.Floor(eulerAngles.z / _snapAngle);
+        _xRot = (int)Math.Round(eulerAngles.x/_snapAngle);
+        _yRot = (int)Math.Round(eulerAngles.y / _snapAngle);
+        _zRot = (int)Math.Round(eulerAngles.z / _snapAngle);
         Rotate();
       }
     }
