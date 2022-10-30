@@ -14,7 +14,7 @@ namespace Gizmo {
     public static ConfigEntry<KeyboardShortcut> CopyPieceRotationKey;
 
     public static ConfigEntry<bool> ShowGizmoPrefab;
-    public static ConfigEntry<bool> UseLocalFrame;
+    public static ConfigEntry<bool> ResetRotation;
 
     public static void BindConfig(ConfigFile config) {
       SnapDivisions =
@@ -70,7 +70,7 @@ namespace Gizmo {
               "Press this key to copy targeted piece's rotation.");
 
       ShowGizmoPrefab = config.Bind("UI", "showGizmoPrefab", true, "Show the Gizmo prefab in placement mode.");
-      UseLocalFrame = config.Bind("RotationFrame", "useLocalFrame", false, "Use the local piece coordinate system for rotations.");
+      ResetRotation = config.Bind("RotationFrame", "resetOnModeChange", true, "Resets the piece's rotation on mode switch.");
     }
   }
 }
