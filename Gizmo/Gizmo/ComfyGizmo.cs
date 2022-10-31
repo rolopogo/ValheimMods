@@ -141,7 +141,7 @@ namespace Gizmo {
         if (Input.GetKeyDown(ChangeRotationModeKey.Value.MainKey)) {
           if(_localFrame) {
             MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, "Default rotation mode enabled");
-            if (ResetRotation.Value) {
+            if (ResetRotationOnModeChange.Value) {
               ResetRotationsLocalFrame();
             } else {
               _eulerAngles = _comfyGizmo.transform.eulerAngles;
@@ -151,7 +151,7 @@ namespace Gizmo {
             
           } else {
             MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, "Local frame rotation mode enabled");
-            if (ResetRotation.Value) {
+            if (ResetRotationOnModeChange.Value) {
               ResetRotations();
             } else {
               Quaternion currentRotation = _comfyGizmoRoot.rotation;
