@@ -1,4 +1,4 @@
-# ComfyGizmo v1.4.0
+# ComfyGizmo v1.5.0
 
 *Comfy-specific version of Gizmo.*
 
@@ -21,7 +21,7 @@
 
   1. **Disable or uninstall** the existing `Gizmo v1.0.0` mod by Rolo.
   2. **Disable or uninstall** any manually installed `ComfyGizmo_v1.3.0` or earlier.
-  3. Go to Settings > Import local mod > select `ComfyGizmo_v1.4.0.zip`.
+  3. Go to Settings > Import local mod > select `ComfyGizmo_v1.5.0.zip`.
   4. Click "OK/Import local mod" on the pop-up for information.
   
 ## Changelog
