@@ -180,14 +180,11 @@ namespace Gizmo {
       if (Input.GetKey(ResetAllRotationKey.Value.MainKey)) {
         ResetRotations();
       } else if (Input.GetKey(XRotationKey.Value.MainKey)) {
-        _xGizmo.localScale = Vector3.one * 1.5f;
-        _eulerAngles.x = GetRotationAngle(_eulerAngles.x);
+        HandleAxisInput(ref _eulerAngles.x, _xGizmo);
       } else if (Input.GetKey(ZRotationKey.Value.MainKey)) {
-        _zGizmo.localScale = Vector3.one * 1.5f;
-        _eulerAngles.z = GetRotationAngle(_eulerAngles.z);
+        HandleAxisInput(ref _eulerAngles.z, _zGizmo);
       } else {
-        _yGizmo.localScale = Vector3.one * 1.5f;
-        _eulerAngles.y = GetRotationAngle(_eulerAngles.y);
+        HandleAxisInput(ref _eulerAngles.y, _yGizmo);
       }
 
       _comfyGizmo.transform.localRotation = Quaternion.Euler(_eulerAngles);
@@ -225,13 +222,13 @@ namespace Gizmo {
       _gizmoRoot.rotation *= Quaternion.AngleAxis(rotation, rotVector);
     }
 
-    static float GetRotationAngle(float rotation) {
+    static void HandleAxisInput(ref float rotation, Transform gizmo) {
+      gizmo.localScale = Vector3.one * 1.5f;
       rotation += Math.Sign(Input.GetAxis("Mouse ScrollWheel")) * _snapAngle;
 
       if (Input.GetKey(ResetRotationKey.Value.MainKey)) {
         rotation = 0f;
       }
-      return rotation;
     }
 
     static void HandleAxisInputLocalFrame(ref float rotation, Vector3 rotVector, Transform gizmo) {
@@ -270,9 +267,9 @@ namespace Gizmo {
     }
 
     static void RotateGizmoComponents(Vector3 eulerAngles) {
-      _xGizmoRoot.localRotation = Quaternion.Euler(eulerAngles.x, 0f, 0f);
+      _xGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, eulerAngles.z);
       _yGizmoRoot.localRotation = Quaternion.Euler(0f, eulerAngles.y, 0f);
-      _zGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, eulerAngles.z);
+      _zGizmoRoot.localRotation = Quaternion.Euler(eulerAngles.x, 0f, 0f);
     }
 
     static void ResetRotationsLocalFrame() {
