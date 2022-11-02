@@ -87,7 +87,7 @@ namespace Gizmo {
                 new CodeMatch(OpCodes.Call),
                 new CodeMatch(OpCodes.Stloc_S))
             .Advance(offset: 5)
-            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _comfyGizmoRoot.rotation))
+            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _xGizmoRoot.rotation))
             .InstructionEnumeration();
       }
 
@@ -267,9 +267,9 @@ namespace Gizmo {
     }
 
     static void RotateGizmoComponents(Vector3 eulerAngles) {
-      _xGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, eulerAngles.z);
+      _xGizmoRoot.localRotation = Quaternion.Euler(eulerAngles.x, 0f, 0f);
       _yGizmoRoot.localRotation = Quaternion.Euler(0f, eulerAngles.y, 0f);
-      _zGizmoRoot.localRotation = Quaternion.Euler(eulerAngles.x, 0f, 0f);
+      _zGizmoRoot.localRotation = Quaternion.Euler(0f, 0f, eulerAngles.z);
     }
 
     static void ResetRotationsLocalFrame() {
