@@ -18,6 +18,7 @@ namespace Gizmo {
     public static ConfigEntry<bool> ShowGizmoPrefab;
     public static ConfigEntry<bool> ResetRotationOnModeChange;
     public static ConfigEntry<bool> ResetRotationOnSnapDivisionChange;
+    public static ConfigEntry<bool> NewGizmoRotation;
 
     public static int MaxSnapDivisions = 256;
     public static int MinSnapDivisions = 2;
@@ -93,6 +94,8 @@ namespace Gizmo {
 
       ResetRotationOnSnapDivisionChange = config.Bind("Reset", "resetOnSnapDivisionChange", true, "Resets the piece's rotation on snap division change.");
       ResetRotationOnModeChange = config.Bind("Reset", "resetOnModeChange", true, "Resets the piece's rotation on mode switch.");
+
+      NewGizmoRotation = config.Bind("Rotation Mode", "newGizmoRotation", false, "Enables post Gizmo v1.2.0 rotation scheme. Restart required for changes to take effect.");
     }
   }
 }

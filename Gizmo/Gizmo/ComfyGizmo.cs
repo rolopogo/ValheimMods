@@ -17,7 +17,7 @@ namespace Gizmo {
   public class ComfyGizmo : BaseUnityPlugin {
     public const string PluginGUID = "com.rolopogo.gizmo.comfy";
     public const string PluginName = "ComfyGizmo";
-    public const string PluginVersion = "1.5.0";
+    public const string PluginVersion = "1.5.1";
 
     static GameObject _gizmoPrefab = null;
     static Transform _gizmoRoot;
@@ -77,7 +77,8 @@ namespace Gizmo {
       [HarmonyTranspiler]
       [HarmonyPatch(nameof(Player.UpdatePlacementGhost))]
       static IEnumerable<CodeInstruction> UpdatePlacementGhostTranspiler(IEnumerable<CodeInstruction> instructions) {
-        return new CodeMatcher(instructions)
+        if(NewGizmoRotation.Value) {
+          return new CodeMatcher(instructions)
             .MatchForward(
                 useEnd: false,
                 new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Player), nameof(Player.m_placeRotation))),
@@ -87,8 +88,23 @@ namespace Gizmo {
                 new CodeMatch(OpCodes.Call),
                 new CodeMatch(OpCodes.Stloc_S))
             .Advance(offset: 5)
-            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _xGizmoRoot.rotation))
+            .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _comfyGizmoRoot.rotation))
             .InstructionEnumeration();
+        } else {
+          return new CodeMatcher(instructions)
+          .MatchForward(
+              useEnd: false,
+              new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Player), nameof(Player.m_placeRotation))),
+              new CodeMatch(OpCodes.Conv_R4),
+              new CodeMatch(OpCodes.Mul),
+              new CodeMatch(OpCodes.Ldc_R4),
+              new CodeMatch(OpCodes.Call),
+              new CodeMatch(OpCodes.Stloc_S))
+          .Advance(offset: 5)
+          .InsertAndAdvance(Transpilers.EmitDelegate<Func<Quaternion, Quaternion>>(_ => _xGizmoRoot.rotation))
+          .InstructionEnumeration();
+        }
+        
       }
 
       [HarmonyPostfix]

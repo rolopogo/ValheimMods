@@ -26,6 +26,10 @@
   
 ## Changelog
 
+### 1.5.1
+  * Added toggle to allow for v1.2.0 rotation scheme versus v1.3.0 rotation scheme. Restart required on enabling/disabling
+  * Fixed issue with gizmo visual axes not rotating correctly.
+
 ### 1.5.0
   * Added hotkeys for halving and doubling snap divisions. PageUp and PageDown by default.
   * Added toggle for resetting piece rotation on snap division change. Enabled by default.
