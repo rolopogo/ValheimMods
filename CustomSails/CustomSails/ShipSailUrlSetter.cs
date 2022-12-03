@@ -47,7 +47,7 @@ namespace CustomSails
             return "Sail Url";
         }
         
-        public bool Interact(Humanoid character, bool hold)
+        public bool Interact(Humanoid character, bool hold, bool alt)
         {
             if (!Plugin.instance.AllowInput()) return false;
             if (hold)
@@ -107,7 +107,7 @@ namespace CustomSails
             using (UnityWebRequest uwr = UnityWebRequest.Get(url))
             {
                 yield return uwr.SendWebRequest();
-                if (uwr.isNetworkError || uwr.isHttpError)
+                if (uwr.result != UnityWebRequest.Result.Success)
                 {
                     Debug.Log(uwr.error + "\n" + url);
                 }
@@ -119,5 +119,6 @@ namespace CustomSails
                 }
             }
         }
+
     }
 }
