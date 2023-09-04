@@ -16,7 +16,7 @@ namespace DaisyChain
 
             foreach (CraftingStation craftingStation in ___m_allStations)
             {
-                if (Vector3.Distance(craftingStation.transform.position, point) < craftingStation.m_rangeBuild)
+                if (Vector3.Distance(craftingStation.transform.position, point) < craftingStation.GetStationBuildRange())
                 {
                     List<CraftingStation> networkStations = new List<CraftingStation>();
                     RecursiveAddNearbyStations(craftingStation, ref networkStations, ___m_allStations);
@@ -42,7 +42,7 @@ namespace DaisyChain
 
             foreach (CraftingStation craftingStation in allStations)
             {
-                if (Vector3.Distance(craftingStation.transform.position, from.transform.position) < Mathf.Max(craftingStation.m_rangeBuild, from.m_rangeBuild))
+                if (Vector3.Distance(craftingStation.transform.position, from.transform.position) < Mathf.Max(craftingStation.GetStationBuildRange(), from.GetStationBuildRange()))
                 {
                     RecursiveAddNearbyStations(craftingStation, ref networkStations, allStations);
                 }
